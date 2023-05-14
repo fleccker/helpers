@@ -16,6 +16,8 @@ namespace helpers.Network.Internal.Tcp
 
         internal Thread ListenerThread { get; private set; }
 
+        internal TcpConnectionState State { get; private set; }
+
         internal bool IsRunning { get; private set; }
 
         internal EventProvider OnTcpAccepted;
