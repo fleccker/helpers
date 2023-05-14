@@ -11,29 +11,31 @@ namespace helpers.Network.Internal.Tcp
 {
     internal class TcpServer
     {
+        internal Dictionary<ushort, TcpConnection> _currentClients = new Dictionary<ushort, TcpConnection>();
+
         internal TcpListener Listener { get; private set; }
         internal IPEndPoint EndPoint { get; set; }
 
         internal Thread ListenerThread { get; private set; }
 
-        internal TcpConnectionState State { get; private set; }
+        internal TcpServerState State { get; private set; }
 
-        internal bool IsRunning { get; private set; }
 
         internal EventProvider OnTcpAccepted;
 
         internal TcpServer(IPEndPoint endPoint)
         {
             EndPoint = endPoint;
+            State = TcpServerState.Initialized;
 
             OnTcpAccepted = new EventProvider();
         }
 
         internal void Start()
         {
-            if (IsRunning) throw new InvalidOperationException($"The TCP server is already running!");
+            if (State is TcpServerState.Listening) throw new InvalidOperationException($"The TCP server is already running!");
 
-            IsRunning = true;
+            State = TcpServerState.Listening;
 
             Listener = new TcpListener(EndPoint);
             Listener.Start();
@@ -44,9 +46,9 @@ namespace helpers.Network.Internal.Tcp
 
         internal void Stop()
         {
-            if (!IsRunning) throw new InvalidOperationException($"The TCP server is not running!");
+            if (!(State is TcpServerState.Listening)) throw new InvalidOperationException($"The TCP server is not running!");
 
-            IsRunning = false;
+            State = TcpServerState.Initialized;
 
             Listener.Stop();
             Listener = null;
@@ -55,12 +57,19 @@ namespace helpers.Network.Internal.Tcp
 
         internal void Listen()
         {
-            while (IsRunning)
+            while (State is TcpServerState.Listening)
             {
                 var incomingClient = Listener.AcceptTcpClient();
                 if (incomingClient == null) continue;
-                
-                OnTcpAccepted.Invoke(new KeyValuePair<string, object>("client", incomingClient));
+
+                var peerId = PeerId.Next;
+
+                _currentClients[peerId] = new TcpConnection(incomingClient, peerId);
+
+                OnTcpAccepted.Invoke(new KeyValuePair<string, object>("client", incomingClient),
+                                     new KeyValuePair<string, object>("conn", _currentClients[peerId]));
+
+
             }
         }
     }

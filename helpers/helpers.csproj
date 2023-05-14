@@ -302,10 +302,13 @@
     <Compile Include="Memory.cs" />
     <Compile Include="Network\Connection\NetworkClientConnection.cs" />
     <Compile Include="Network\Connection\NetworkServerConnection.cs" />
-    <Compile Include="Network\Internal\Tcp\TcpClient.cs" />
+    <Compile Include="Network\Internal\MessageId.cs" />
+    <Compile Include="Network\Internal\PeerId.cs" />
     <Compile Include="Network\Internal\Tcp\TcpConnection.cs" />
     <Compile Include="Network\Internal\Tcp\TcpConnectionState.cs" />
+    <Compile Include="Network\Internal\Tcp\TcpPayload.cs" />
     <Compile Include="Network\Internal\Tcp\TcpServer.cs" />
+    <Compile Include="Network\Internal\Tcp\TcpServerState.cs" />
     <Compile Include="Network\NetworkClient.cs" />
     <Compile Include="Network\NetworkConnection.cs" />
     <Compile Include="Network\NetworkServer.cs" />
