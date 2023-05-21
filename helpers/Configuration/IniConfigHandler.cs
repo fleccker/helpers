@@ -10,6 +10,7 @@ using System.Reflection;
 
 namespace helpers.Configuration
 {
+    [LogSource("Ini Handler")]
     public class IniConfigHandler
     {
         private Dictionary<object, Tuple<IniConfigAttribute, object>> _registeredConfigs = new Dictionary<object, Tuple<IniConfigAttribute, object>>();

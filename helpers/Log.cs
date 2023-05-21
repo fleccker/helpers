@@ -31,6 +31,14 @@ namespace helpers
                 {
                     AddLibrarySource(logSourceAttribute.GetSource());
                 }
+
+                foreach (var method in type.GetMethods())
+                {
+                    if (method.TryGetAttribute(out logSourceAttribute))
+                    {
+                        AddLibrarySource(logSourceAttribute.GetSource());
+                    }
+                }
             }
         }
 
@@ -158,17 +166,13 @@ namespace helpers
         {
             var method = GetCallingMethod(framesToSkip);
 
-            if (_attributedSources.TryGetValue(method.DeclaringType, out var source))
-                return source;
-
-            if (method.DeclaringType.TryGetAttribute<LogSourceAttribute>(out var sourceAttribute))
+            if (_attributedSources.TryGetValue(method.DeclaringType, out var source)) return source;
+            if (method.DeclaringType.TryGetAttribute<LogSourceAttribute>(out var sourceAttribute) || method.TryGetAttribute(out sourceAttribute))
                 source = sourceAttribute.GetSource();
             else
             {
-                if (_sourceResolver != null)
-                    source = _sourceResolver(method, method.DeclaringType);
-                else
-                    source = $"{method.DeclaringType.Name} :: {method.Name}";
+                if (_sourceResolver != null) source = _sourceResolver(method, method.DeclaringType);
+                else source = method.DeclaringType.Name.SpaceByPascalCase();
             }
 
             _attributedSources[method.DeclaringType] = source;
@@ -177,7 +181,16 @@ namespace helpers
 
         private static MethodBase GetCallingMethod(int framesToSkip)
         {
-            return new StackFrame(1 + framesToSkip).GetMethod();
+            var trace = new StackTrace(framesToSkip);
+
+            foreach (var frame in trace.GetFrames())
+            {
+                var method = frame.GetMethod();
+                if (method.DeclaringType == typeof(Log)) continue;
+                return method;
+            }
+
+            return null;
         }
     }
 }

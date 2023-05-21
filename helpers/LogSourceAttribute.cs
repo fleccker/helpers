@@ -2,7 +2,7 @@
 
 namespace helpers
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Struct)]
     public class LogSourceAttribute : Attribute
     {
         private string _source;
@@ -12,10 +12,7 @@ namespace helpers
             _source = source?.ToString() ?? "unknown";
         }
 
-        public string GetSource()
-            => _source;
-
-        public void SetSource(string source)
-            => _source = source;
+        public string GetSource() => _source;
+        public void SetSource(string source) => _source = source;
     }
 }

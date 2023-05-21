@@ -8,8 +8,11 @@ using helpers.Extensions;
 
 using FastGenericNew;
 
+using MonoMod.Utils;
+
 namespace helpers
 {
+    [LogSource("Reflection")]
     public static class Reflection
     {
         public static readonly IReadOnlyList<TypeCode> PrimitiveTypes = new List<TypeCode>() 
@@ -17,6 +20,30 @@ namespace helpers
                                                                           TypeCode.UInt16, TypeCode.Int32, TypeCode.UInt32, TypeCode.Int64,
                                                                           TypeCode.UInt64, TypeCode.Single, TypeCode.Double, TypeCode.Decimal,
                                                                           TypeCode.DateTime, TypeCode.Char, TypeCode.String };
+
+        public static Type[] GetGenericParameterConstraints(MethodInfo method)
+        {
+            var list = new List<Type>();
+            method = method.GetGenericMethodDefinition();
+            foreach (var arg in method.GetGenericArguments()) list.AddRange(arg.GetGenericParameterConstraints());
+            return list.ToArray();
+        }
+
+        public static bool IsConstraint(MethodInfo method, GenericParameterAttributes genericParameterAttributes)
+        {
+            method = method.MakeGenericMethod();
+
+            foreach (var arg in method.GetGenericArguments())
+            {
+                if (arg.GenericParameterAttributes == genericParameterAttributes || arg.GenericParameterAttributes.Has(genericParameterAttributes))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public static void SetField(Type type, string fieldName, object value, object handle = null)
             => TrySetField(type, fieldName, value, handle);
 

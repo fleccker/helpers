@@ -16,7 +16,8 @@ using helpers.Extensions;
 
 namespace helpers
 {
-    public static class CurrentSystem 
+    [LogSource("Current System")]
+    public static class CurrentSystem
     {
         private static OperatingSystem _sys;
         private static OperatingSystemInfo _sysInfo;

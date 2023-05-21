@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 namespace helpers
 {
+    [LogSource("Waiter")]
     public static class Waiter
     {
         public static void WaitBlock(int time)

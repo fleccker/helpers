@@ -2,6 +2,7 @@
 
 namespace helpers.Unix
 {
+    [LogSource("Linux Shell")]
     public class LinuxCommand 
     {
         private string _command = "";

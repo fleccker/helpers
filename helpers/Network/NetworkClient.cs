@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace helpers.Network
 {
-    internal class NetworkClient
+    public class NetworkClient
     {
+        public static NetworkClient Instance { get; } = new NetworkClient();
     }
 }

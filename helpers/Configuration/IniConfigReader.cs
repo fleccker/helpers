@@ -2,6 +2,7 @@
 
 namespace helpers.Configuration
 {
+    [LogSource("Ini Reader")]
     public class IniConfigReader
     {
         private string[] _buffer;

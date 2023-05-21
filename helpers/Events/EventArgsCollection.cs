@@ -3,9 +3,12 @@ using System.Collections.Generic;
 
 namespace helpers.Events
 {
+    [LogSource("Event Args")]
     public class EventArgsCollection
     {
         private Dictionary<string, object> _args = new Dictionary<string, object>();
+
+        public IReadOnlyDictionary<string, object> Arguments { get => _args; }
 
         public T Get<T>(string key) => _args[key].SafeAs<T>();
 

@@ -1,11 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Linq;
 
 namespace helpers.Services
 {
+    [LogSource("Service Collection")]
     public class ServiceCollection : IServiceCollection
     {
         private Dictionary<Type, IService> _services;

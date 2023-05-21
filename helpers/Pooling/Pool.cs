@@ -5,6 +5,7 @@ using System.Collections.Concurrent;
 
 namespace helpers.Pooling
 {
+    [LogSource("Pool")]
     public class Pool<T>
     {
         internal Action<T> _prepareToGet;
@@ -16,16 +17,13 @@ namespace helpers.Pooling
             _prepareToGet = prepareGet;
             _prepareToStore = prepareStore;
             _constructor = constructor;
+
+            Queue = new ConcurrentQueue<T>();
         }
 
         public ConcurrentQueue<T> Queue { get; private set; }
 
         public PoolMode Mode { get; set; } = PoolMode.DefaultOnEmpty;
-
-        public void Initialize()
-        {
-            Queue = new ConcurrentQueue<T>();
-        }
 
         public void Destroy()
         {

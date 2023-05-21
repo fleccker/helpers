@@ -20,8 +20,8 @@ namespace helpers.Network.Internal.Tcp
 
         internal TcpServerState State { get; private set; }
 
-
         internal EventProvider OnTcpAccepted;
+        internal EventProvider OnTcpClosed;
 
         internal TcpServer(IPEndPoint endPoint)
         {
@@ -29,6 +29,7 @@ namespace helpers.Network.Internal.Tcp
             State = TcpServerState.Initialized;
 
             OnTcpAccepted = new EventProvider();
+            OnTcpClosed = new EventProvider();
         }
 
         internal void Start()
@@ -64,12 +65,10 @@ namespace helpers.Network.Internal.Tcp
 
                 var peerId = PeerId.Next;
 
-                _currentClients[peerId] = new TcpConnection(incomingClient, peerId);
+                _currentClients[peerId] = new TcpConnection(incomingClient, peerId, TcpTransportMode.UseSendQueue);
 
                 OnTcpAccepted.Invoke(new KeyValuePair<string, object>("client", incomingClient),
                                      new KeyValuePair<string, object>("conn", _currentClients[peerId]));
-
-
             }
         }
     }

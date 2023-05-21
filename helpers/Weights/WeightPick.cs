@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace helpers.Weights
 {
+    [LogSource("Weight Picker")]
     public static class WeightPick
     {
         public static bool ChooseBool(int trueChance)

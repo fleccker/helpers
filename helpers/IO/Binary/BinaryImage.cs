@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace helpers.IO.Binary
 {
+    [LogSource("Binary Image")]
     public class BinaryImage
     {
         private HashSet<object> _loadedObjects = new HashSet<object>();

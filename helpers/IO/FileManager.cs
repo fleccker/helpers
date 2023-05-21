@@ -10,6 +10,7 @@ using helpers.Extensions;
 
 namespace helpers.IO
 {
+    [LogSource("File Manager")]
     public class FileManager 
     {
         private FileInfo _file;

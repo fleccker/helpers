@@ -8,6 +8,7 @@ using System.Security.Cryptography;
 
 namespace helpers
 {
+    [LogSource("Random Generator")]
     public static class RandomGenerator
     {
         private static Random _random = new Random();

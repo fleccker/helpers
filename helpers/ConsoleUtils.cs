@@ -2,6 +2,7 @@
 
 namespace helpers
 {
+    [LogSource("Console Utils")]
     public static class ConsoleUtils
     {
         public static bool TryReadInput<T>(out T inputValue)

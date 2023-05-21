@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 namespace helpers.Configuration
 {
+    [LogSource("Ini Builder")]
     public class IniConfigBuilder
     {
         private IniConfigHandler _handler;

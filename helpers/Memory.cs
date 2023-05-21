@@ -6,6 +6,7 @@ using System.Diagnostics;
 
 namespace helpers
 {
+    [LogSource("Memory")]
     public class Memory
     {
         private MemorySharp _mem;

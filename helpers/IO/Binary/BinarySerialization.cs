@@ -8,6 +8,7 @@ using System.Collections;
 
 namespace helpers.IO.Binary
 {
+    [LogSource("Binary Serialization")]
     public static class BinarySerialization
     {
         private static HashSet<BinarySerializerBase> _serializers = new HashSet<BinarySerializerBase>();

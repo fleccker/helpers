@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace helpers.Network
 {
-    internal class NetworkConnection
+    public class NetworkConnection
     {
     }
 }

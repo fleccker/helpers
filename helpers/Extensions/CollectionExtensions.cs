@@ -5,8 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Collections.Concurrent;
 
+using Tuple = System.Tuple;
+
 namespace helpers.Extensions
 {
+    [LogSource("Collection Extensions")]
     public static class CollectionExtensions
     {
         public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> collection)
@@ -18,7 +21,7 @@ namespace helpers.Extensions
                 if (dict.ContainsKey(pair.Key))
                     dict[pair.Key] = pair.Value;
                 else
-                    dict.Add(pair.Key, pair.Value); 
+                    dict.Add(pair.Key, pair.Value);
             }
 
             return dict;
@@ -85,17 +88,17 @@ namespace helpers.Extensions
 
         public static bool Match<T>(this IEnumerable<T> source, IEnumerable<T> target)
         {
-            if (source.Count() != target.Count()) 
+            if (source.Count() != target.Count())
                 return false;
 
             for (int i = 0; i < source.Count(); i++)
             {
                 var item = source.ElementAt(i);
                 var targetItem = target.ElementAt(i);
-                
+
                 if (item is object itemObj && targetItem is object targetObj)
                 {
-                    if (itemObj is null && targetObj is null) 
+                    if (itemObj is null && targetObj is null)
                         continue;
                 }
 
@@ -106,7 +109,7 @@ namespace helpers.Extensions
             }
 
             return true;
-        }    
+        }
 
         public static void Shuffle<T>(this ICollection<T> source)
         {

@@ -5,6 +5,7 @@ using System.Linq;
 
 namespace helpers.Extensions
 {
+    [LogSource("Enum Extensions")]
     public static class EnumExtensions
     {
         public static T AddFlags<T>(this T currentFlags, params T[] flags) where T : struct, Enum

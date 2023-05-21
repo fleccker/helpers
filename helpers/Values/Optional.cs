@@ -1,5 +1,6 @@
 ﻿namespace helpers.Values
 {
+    [LogSource("Optional Value")]
     public class Optional<TValue>
     {
         private TValue _value;

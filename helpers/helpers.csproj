@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\Costura.Fody.5.8.0-alpha0098\build\Costura.Fody.props" Condition="Exists('..\packages\Costura.Fody.5.8.0-alpha0098\build\Costura.Fody.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -27,6 +27,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>Latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -37,6 +38,7 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DocumentationFile>bin\Release\helpers.xml</DocumentationFile>
+    <LangVersion>Latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony, Version=2.3.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -264,6 +266,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Callbacks\Callback.cs" />
+    <Compile Include="Callbacks\CallbackCollection.cs" />
     <Compile Include="Configuration\Converters\Json\JsonConfigConverter.cs" />
     <Compile Include="Configuration\IniConfigAttribute.cs" />
     <Compile Include="Configuration\IniConfigBuilder.cs" />
@@ -274,6 +278,8 @@
     <Compile Include="Configuration\IniConfigReader.cs" />
     <Compile Include="Configuration\IniConfigWriter.cs" />
     <Compile Include="ConsoleUtils.cs" />
+    <Compile Include="Debug\DebugLog.cs" />
+    <Compile Include="Debug\DebugLogData.cs" />
     <Compile Include="Encryption\Encryptor.cs" />
     <Compile Include="Events\EventArgsCollection.cs" />
     <Compile Include="Events\EventProvider.cs" />
@@ -282,6 +288,7 @@
     <Compile Include="Extensions\EnumExtensions.cs" />
     <Compile Include="Extensions\MemberExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Extensions\TimerExtensions.cs" />
     <Compile Include="IO\Binary\BinaryImage.cs" />
     <Compile Include="IO\Binary\BinarySerialization.cs" />
     <Compile Include="IO\Binary\BinarySerializerBase.cs" />
@@ -309,9 +316,16 @@
     <Compile Include="Network\Internal\Tcp\TcpPayload.cs" />
     <Compile Include="Network\Internal\Tcp\TcpServer.cs" />
     <Compile Include="Network\Internal\Tcp\TcpServerState.cs" />
+    <Compile Include="Network\Internal\Tcp\TcpTransportMode.cs" />
     <Compile Include="Network\NetworkClient.cs" />
     <Compile Include="Network\NetworkConnection.cs" />
+    <Compile Include="Network\NetworkExtensions.cs" />
     <Compile Include="Network\NetworkServer.cs" />
+    <Compile Include="Network\Transport\Packets\Internal\SynchronizationRequestPacket.cs" />
+    <Compile Include="Network\Transport\Packets\Internal\SynchronizationResponsePacket.cs" />
+    <Compile Include="Network\Transport\Packets\StringPacket.cs" />
+    <Compile Include="Network\Transport\TransportBatch.cs" />
+    <Compile Include="Network\Transport\TransportHelper.cs" />
     <Compile Include="Pooling\Pool.cs" />
     <Compile Include="CurrentSystem.cs" />
     <Compile Include="DisposableBase.cs" />
@@ -355,7 +369,9 @@
   <ItemGroup>
     <Content Include="Fasm.NET.xml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Network\Transport\Channels\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

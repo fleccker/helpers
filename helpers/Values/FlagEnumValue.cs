@@ -6,6 +6,7 @@ using System.Linq;
 
 namespace helpers.Values
 {
+    [LogSource("Flag Enum Value")]
     public class FlagEnumValue<T> where T : struct, Enum
     {
         private T _flagValue;

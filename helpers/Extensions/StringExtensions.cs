@@ -9,9 +9,13 @@ using helpers.IO;
 
 namespace helpers.Extensions
 {
+    [LogSource("String Extensions")]
     public static class StringExtensions
     {
         public const string NewLinesRegex = "r\n|\r|\n";
+        public const string PascalCaseRegex = "([a-z,0-9](?=[A-Z])|[A-Z](?=[A-Z][a-z]))";
+
+        public static string SpaceByPascalCase(this string str) => Regex.Replace(str, PascalCaseRegex, "$1 ", RegexOptions.Compiled);
 
         public static string RemovePathUnsafe(this string value) => value.Remove(FileManager.PathIllegalCharacters);
 

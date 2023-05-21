@@ -30,10 +30,13 @@ namespace helpers
 
         public static StackTrace Trace { get => new StackTrace(); }
 
-        public static IReadOnlyList<StackFrame> Frames { get => Trace
-                                                                    .GetFrames()
-                                                                    .Where(x => x.GetMethod().DeclaringType != typeof(ExceptionManager))
-                                                                    .ToList(); }
+        public static IReadOnlyList<StackFrame> Frames
+        {
+            get => Trace
+                       .GetFrames()
+                       .Where(x => x.GetMethod().DeclaringType != typeof(ExceptionManager))
+                       .ToList();
+        }
 
         public static IReadOnlyList<MethodBase> StackMethods { get => Frames.Select(x => x.GetMethod()).ToList(); }
         public static IReadOnlyList<Type> StackTypes { get => StackMethods.Select(x => x.DeclaringType).ToList(); }
@@ -46,7 +49,7 @@ namespace helpers
 
         public static bool LogToConsole { get; set; }
 
-        public static bool Any<T>() where T : Exception 
+        public static bool Any<T>() where T : Exception
             => _exceptionStore.Any(x => x is T);
 
         public static void Load()

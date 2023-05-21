@@ -5,6 +5,7 @@ using System.Linq;
 
 namespace helpers.IO
 {
+    [LogSource("Directory Manager")]
     public class DirectoryManager 
     {
         private DirectoryInfo _dirInfo;

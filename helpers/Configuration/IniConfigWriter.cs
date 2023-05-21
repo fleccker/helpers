@@ -5,6 +5,7 @@ using System.Text;
 
 namespace helpers.Configuration
 {
+    [LogSource("Ini Writer")]
     public class IniConfigWriter
     {
         private IConfigConverter _converter;

@@ -2,6 +2,7 @@
 
 namespace helpers.Extensions
 {
+    [LogSource("Member Extensions")]
     public static class MemberExtensions
     {
         public static string GetName(this Assembly assembly) => assembly.GetName().Name;
