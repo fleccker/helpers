@@ -119,6 +119,7 @@
     <Reference Include="MonoMod.Utils, Version=23.3.22.1, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MonoModReorg.Utils.23.3.22.1\lib\net452\MonoMod.Utils.dll</HintPath>
     </Reference>
+    <Reference Include="mscorlib" />
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -224,6 +225,12 @@
     <Reference Include="System.Text.Encoding.CodePages, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Text.Encoding.CodePages.8.0.0-preview.3.23174.8\lib\net462\System.Text.Encoding.CodePages.dll</HintPath>
     </Reference>
+    <Reference Include="System.Text.Encodings.Web, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encodings.Web.7.0.0\lib\net462\System.Text.Encodings.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Json.7.0.0\lib\net462\System.Text.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System.Text.RegularExpressions, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Text.RegularExpressions.4.3.1\lib\net463\System.Text.RegularExpressions.dll</HintPath>
       <Private>True</Private>
@@ -231,6 +238,9 @@
     </Reference>
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -261,13 +271,14 @@
     <Reference Include="UnityEngine.UnityWebRequestWWWModule">
       <HintPath>D:\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
     </Reference>
+    <Reference Include="WatsonTcp, Version=5.1.2.0, Culture=neutral, PublicKeyToken=c61f5f04303a13b3, processorArchitecture=MSIL">
+      <HintPath>..\packages\WatsonTcp.5.1.2\lib\net48\WatsonTcp.dll</HintPath>
+    </Reference>
     <Reference Include="YamlDotNet, Version=13.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
       <HintPath>..\packages\YamlDotNet.13.1.0\lib\net47\YamlDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Callbacks\Callback.cs" />
-    <Compile Include="Callbacks\CallbackCollection.cs" />
     <Compile Include="Configuration\Converters\Json\JsonConfigConverter.cs" />
     <Compile Include="Configuration\IniConfigAttribute.cs" />
     <Compile Include="Configuration\IniConfigBuilder.cs" />
@@ -278,10 +289,7 @@
     <Compile Include="Configuration\IniConfigReader.cs" />
     <Compile Include="Configuration\IniConfigWriter.cs" />
     <Compile Include="ConsoleUtils.cs" />
-    <Compile Include="Debug\DebugLog.cs" />
-    <Compile Include="Debug\DebugLogData.cs" />
     <Compile Include="Encryption\Encryptor.cs" />
-    <Compile Include="Events\EventArgsCollection.cs" />
     <Compile Include="Events\EventProvider.cs" />
     <Compile Include="ExceptionManager.cs" />
     <Compile Include="Extensions\CollectionExtensions.cs" />
@@ -307,25 +315,11 @@
     <Compile Include="LogLevel.cs" />
     <Compile Include="LogSourceAttribute.cs" />
     <Compile Include="Memory.cs" />
-    <Compile Include="Network\Connection\NetworkClientConnection.cs" />
-    <Compile Include="Network\Connection\NetworkServerConnection.cs" />
-    <Compile Include="Network\Internal\MessageId.cs" />
-    <Compile Include="Network\Internal\PeerId.cs" />
-    <Compile Include="Network\Internal\Tcp\TcpConnection.cs" />
-    <Compile Include="Network\Internal\Tcp\TcpConnectionState.cs" />
-    <Compile Include="Network\Internal\Tcp\TcpPayload.cs" />
-    <Compile Include="Network\Internal\Tcp\TcpServer.cs" />
-    <Compile Include="Network\Internal\Tcp\TcpServerState.cs" />
-    <Compile Include="Network\Internal\Tcp\TcpTransportMode.cs" />
-    <Compile Include="Network\NetworkClient.cs" />
-    <Compile Include="Network\NetworkConnection.cs" />
-    <Compile Include="Network\NetworkExtensions.cs" />
-    <Compile Include="Network\NetworkServer.cs" />
-    <Compile Include="Network\Transport\Packets\Internal\SynchronizationRequestPacket.cs" />
-    <Compile Include="Network\Transport\Packets\Internal\SynchronizationResponsePacket.cs" />
-    <Compile Include="Network\Transport\Packets\StringPacket.cs" />
-    <Compile Include="Network\Transport\TransportBatch.cs" />
-    <Compile Include="Network\Transport\TransportHelper.cs" />
+    <Compile Include="Network\TypeUtils\NetworkField.cs" />
+    <Compile Include="Network\TypeUtils\NetworkFieldType.cs" />
+    <Compile Include="Network\TypeUtils\NetworkType.cs" />
+    <Compile Include="Network\TypeUtils\NetworkTypeRecorder.cs" />
+    <Compile Include="ObjectCollection.cs" />
     <Compile Include="Pooling\Pool.cs" />
     <Compile Include="CurrentSystem.cs" />
     <Compile Include="DisposableBase.cs" />
@@ -368,9 +362,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Fasm.NET.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Network\Transport\Channels\" />
+    <Compile Include="Locks\MethodLock.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

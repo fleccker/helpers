@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 
 using helpers.Extensions;
@@ -20,6 +21,8 @@ namespace helpers
                                                                           TypeCode.UInt16, TypeCode.Int32, TypeCode.UInt32, TypeCode.Int64,
                                                                           TypeCode.UInt64, TypeCode.Single, TypeCode.Double, TypeCode.Decimal,
                                                                           TypeCode.DateTime, TypeCode.Char, TypeCode.String };
+
+        public static MethodBase GetExecutingMethod(int skipFrames = 0) => new StackTrace().GetFrames().Skip(skipFrames + 1).First().GetMethod();
 
         public static Type[] GetGenericParameterConstraints(MethodInfo method)
         {

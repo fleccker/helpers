@@ -6,23 +6,32 @@ namespace helpers.Events
     [LogSource("Event Provider")]
     public class EventProvider
     {
-        private List<Action<EventArgsCollection>> _handlers = new List<Action<EventArgsCollection>>();
+        public string Id { get; }
+        
+        public EventProvider() { Id = string.Empty; }
+        public EventProvider(string id) => Id = id;
+        
+        private List<Action<ObjectCollection>> _handlers = new List<Action<ObjectCollection>>();
         private List<Action> _parameterLessHandlers = new List<Action>();
 
-        public void Invoke(params KeyValuePair<string, object>[] args)
+        public void Invoke(params object[] args)
         {
-            var evArgs = new EventArgsCollection();
-            foreach (var arg in args) evArgs.WithArg(arg.Key, arg.Value);
-            Invoke(evArgs);
+            var collection = new ObjectCollection();
+            foreach (var arg in args)
+            {
+                if (arg is KeyValuePair<string, object> valuePair) collection.Add(valuePair.Value, valuePair.Key);
+                else if (arg is Tuple<string, object> tuple) collection.Add(tuple.Item2, tuple.Item1);
+                else collection.Add(arg);
+            }
         }
 
-        public void Invoke(EventArgsCollection eventArgsCollection)
+        public void Invoke(ObjectCollection eventArgsCollection)
         {
             _handlers.ForEach(y => y.Invoke(eventArgsCollection));
             _parameterLessHandlers.ForEach(x => x.Invoke());
         }
 
-        public void Add(Action<EventArgsCollection> handler)
+        public void Add(Action<ObjectCollection> handler)
         {
             if (Has(handler)) return;
             _handlers.Add(handler);
@@ -34,7 +43,7 @@ namespace helpers.Events
             _parameterLessHandlers.Add(handler);
         }
 
-        public void Remove(Action<EventArgsCollection> handler)
+        public void Remove(Action<ObjectCollection> handler)
         {
             if (!Has(handler)) return;
             _handlers.Remove(handler);
@@ -46,7 +55,7 @@ namespace helpers.Events
             _parameterLessHandlers.Remove(handler);
         }
 
-        public bool Has(Action<EventArgsCollection> handler) => _handlers.Contains(handler);
+        public bool Has(Action<ObjectCollection> handler) => _handlers.Contains(handler);
         public bool Has(Action action) => _parameterLessHandlers.Contains(action);
         public void Clear()
         {

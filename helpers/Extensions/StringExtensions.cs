@@ -116,6 +116,8 @@ namespace helpers.Extensions
 
         public static string CutByChar(this string str, char c, int lastIndex, out (int startIndex, int endIndex) index)
         {
+            index = 0;
+            
             int startIndex = 0;
             int endIndex = 0;
 
