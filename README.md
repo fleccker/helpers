@@ -22,7 +22,6 @@ With that said, I use these libraries:
 - [WatsonTcp](https://github.com/jchristn/WatsonTcp)
 - [Costura](https://github.com/Fody/Costura)
 - [Enums.NET](https://github.com/TylerBrinkley/Enums.NET)
-- Fasm.NET
 - [Fasterflect](https://github.com/buunguyen/fasterflect)
 - [FastGenericNew](https://github.com/Nyrest/FastGenericNew)
 - [Fody](https://github.com/Fody/Fody)
