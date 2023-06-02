@@ -1,4 +1,7 @@
-﻿using System;
+﻿using helpers.Extensions;
+using helpers.Random;
+
+using System;
 using System.Collections.Generic;
 
 namespace helpers.Events
@@ -8,26 +11,44 @@ namespace helpers.Events
     {
         public string Id { get; }
         
-        public EventProvider() { Id = string.Empty; }
-        public EventProvider(string id) => Id = id;
+        public EventProvider() 
+        { 
+            Id = RandomGeneration.Default.GetString(5);
+            EventManager.Add(this);
+        }
+
+        public EventProvider(string id)
+        {
+            Id = id;
+            EventManager.Add(this);
+        }
         
         private List<Action<ObjectCollection>> _handlers = new List<Action<ObjectCollection>>();
         private List<Action> _parameterLessHandlers = new List<Action>();
 
         public void Invoke(params object[] args)
         {
+            if (args is null || !args.Any())
+            {
+                Invoke((ObjectCollection)null);
+                return;
+            }
+
             var collection = new ObjectCollection();
+
             foreach (var arg in args)
             {
                 if (arg is KeyValuePair<string, object> valuePair) collection.Add(valuePair.Value, valuePair.Key);
                 else if (arg is Tuple<string, object> tuple) collection.Add(tuple.Item2, tuple.Item1);
                 else collection.Add(arg);
             }
+
+            Invoke(collection);
         }
 
         public void Invoke(ObjectCollection eventArgsCollection)
         {
-            _handlers.ForEach(y => y.Invoke(eventArgsCollection));
+            if (eventArgsCollection != null) _handlers.ForEach(y => y.Invoke(eventArgsCollection));
             _parameterLessHandlers.ForEach(x => x.Invoke());
         }
 
@@ -57,6 +78,7 @@ namespace helpers.Events
 
         public bool Has(Action<ObjectCollection> handler) => _handlers.Contains(handler);
         public bool Has(Action action) => _parameterLessHandlers.Contains(action);
+
         public void Clear()
         {
             _handlers.Clear();

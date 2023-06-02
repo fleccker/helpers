@@ -1,3 +1,5 @@
+using helpers.Random;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +11,7 @@ public class NetworkTypeRecorder
     private readonly Dictionary<string, NetworkType> _recordedTypes = new Dictionary<string, NetworkType>();
     private const int TypeRecordIdSize = 15;
 
-    public static string NextTypeId => helpers.RandomGenerator.Ticket(TypeRecordIdSize);
+    public static string NextTypeId => RandomGeneration.Default.GetString(TypeRecordIdSize);
     public static NetworkTypeRecorder GlobalRecorder { get; } = new NetworkTypeRecorder();
 
     public Type GetRecordType(NetworkType record) => Type.GetType(record.AssemblyName);

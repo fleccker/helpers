@@ -4,8 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections.Concurrent;
-
-using Tuple = System.Tuple;
+using helpers.Random;
+using System.Collections;
 
 namespace helpers.Extensions
 {
@@ -111,6 +111,32 @@ namespace helpers.Extensions
             return true;
         }
 
+        public static int Count(this IEnumerable collection)
+        {
+            var count = 0;
+            var enumerator = collection.GetEnumerator();
+
+            while (enumerator.MoveNext()) count++;
+
+            return count;
+        }
+
+        public static object ElementAt(this IEnumerable collection, int index)
+        {
+            var curIndex = 0;
+            var enumerator = collection.GetEnumerator();
+
+            while (enumerator.MoveNext())
+            {
+                if (index == curIndex) return enumerator.Current;
+                else continue;
+            }
+
+            return null;
+        }
+
+        public static bool Any(this IEnumerable collection) => collection.Count() > 0;
+
         public static void Shuffle<T>(this ICollection<T> source)
         {
             var copy = ListPool<T>.Pool.Get(source);
@@ -120,8 +146,8 @@ namespace helpers.Extensions
             {
                 size--;
 
-                var index = RandomGenerator.Int32(0, size + 1);
-                var value = copy.ElementAt(index);
+                var index = RandomGeneration.Default.GetRandom(0, size + 1);
+                var value = copy.ElementAt<T>(index);
 
                 copy[index] = copy[size];
                 copy[size] = value;

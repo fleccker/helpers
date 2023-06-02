@@ -38,7 +38,7 @@ namespace helpers
 
             foreach (var arg in method.GetGenericArguments())
             {
-                if (arg.GenericParameterAttributes == genericParameterAttributes || arg.GenericParameterAttributes.Has(genericParameterAttributes))
+                if (arg.GenericParameterAttributes == genericParameterAttributes || arg.GenericParameterAttributes.HasFlag(genericParameterAttributes))
                 {
                     return true;
                 }

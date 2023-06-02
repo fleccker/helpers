@@ -1,8 +1,6 @@
 ﻿using System.IO;
 using System.Security.Cryptography;
 
-using Newtonsoft.Json;
-
 namespace helpers.Encryption
 {
     [LogSource("Encryptor")]
@@ -16,9 +14,11 @@ namespace helpers.Encryption
 
             using (var memory = new MemoryStream())
             using (var stream = new CryptoStream(memory, Aes.CreateEncryptor(), CryptoStreamMode.Write))
-            using (var writer = new StreamWriter(stream))
+            using (var writer = new BinaryWriter(stream))
             {
-                writer.Write(JsonConvert.SerializeObject(input));
+                writer.Write(input);
+                writer.Write(input.Length);
+
                 encrypted = memory.ToArray();
             }
 
@@ -31,9 +31,9 @@ namespace helpers.Encryption
 
             using (var memory = new MemoryStream(input))
             using (var stream = new CryptoStream(memory, Aes.CreateEncryptor(), CryptoStreamMode.Read))
-            using (var reader = new StreamReader(stream))
+            using (var reader = new BinaryReader(stream))
             {
-                decrypted = JsonConvert.DeserializeObject<byte[]>(reader.ReadToEnd());
+                decrypted = reader.ReadBytes(reader.ReadInt32());
             }
 
             return decrypted;

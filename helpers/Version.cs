@@ -1,8 +1,7 @@
-﻿using Newtonsoft.Json;
-
-using System.Linq;
+﻿using System.Linq;
 using System.Reflection;
-
+using System.Text.Json.Serialization;
+using helpers.Json;
 using helpers.Properties;
 
 namespace helpers
@@ -11,42 +10,41 @@ namespace helpers
     {
         public static Version Current { get; } = FromString(Resources.LibraryVersion);
 
-        [JsonProperty("version_minor")]
+        [JsonPropertyName("version_minor")]
         public int Major { get; }
 
-        [JsonProperty("version_minor")]
+        [JsonPropertyName("version_minor")]
         public int Minor { get; }
 
-        [JsonProperty("version_build")]
+        [JsonPropertyName("version_build")]
         public int Build { get; }
 
-        [JsonProperty("version_patch")]
+        [JsonPropertyName("version_patch")]
         public char Patch { get; }
 
-        [JsonProperty("version_branch")]
+        [JsonPropertyName("version_branch")]
         public string Branch { get; }
 
         [JsonConstructor]
         public Version(
-            [JsonProperty("version_minor")] int major, 
-            [JsonProperty("version_minor")] int minor, 
-            [JsonProperty("version_build")] int build, 
+            int version_major, 
+            int version_minor, 
+            int version_build, 
 
-            [JsonProperty("version_patch")] char patch, 
+            char version_patch, 
 
-            [JsonProperty("version_brach")] string branch)
+            string version_branch)
         {
-            Major = major;
-            Minor = minor;
-            Build = build;
+            Major = version_major;
+            Minor = version_minor;
+            Build = version_build;
 
-            Patch = patch;
+            Patch = version_patch;
 
-            Branch = branch;
+            Branch = version_branch;
         }
 
-        public string ToJson(bool indent = true)
-            => JsonConvert.SerializeObject(this, indent ? Formatting.Indented : Formatting.None);
+        public string ToJson(bool indent = true) => JsonHelper.ToJson(this, JsonOptionsBuilder.Default.WithIndented(indent));
 
         public static Version FromString(string str)
         {
@@ -63,11 +61,7 @@ namespace helpers
                 "release");
         }
 
-        public static Version FromJson(string json)
-        {
-            return JsonConvert.DeserializeObject<Version>(json);
-        }
-
+        public static Version FromJson(string json) => JsonHelper.FromJson<Version>(json);
         public static Version FromAssemblyName(AssemblyName assemblyName)
         {
             return new Version(

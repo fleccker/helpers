@@ -1,11 +1,10 @@
-﻿using ByteSizeLib;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Diagnostics;
 using System.Linq;
+
 using helpers.Extensions;
 
 namespace helpers.IO
@@ -210,59 +209,6 @@ namespace helpers.IO
         public string ReadText()
         {
             return File.ReadAllText(Path);
-        }
-
-        public double GetSizeInKiloBytes()
-        {
-            var size = ByteSize.FromBytes(Size);
-
-            return Math.Round(size.KiloBytes);
-        }
-
-        public double GetSizeInMegaBytes()
-        {
-            var size = ByteSize.FromBytes(Size);
-
-            return Math.Round(size.MegaBytes);
-        }
-
-        public double GetSizeInGigaBytes()
-        {
-            var size = ByteSize.FromBytes(Size);
-
-            return Math.Round(size.GigaBytes);
-        }
-
-        public double GetSizeInPetaBytes()
-        {
-            var size = ByteSize.FromBytes(Size);
-
-            return Math.Round(size.PetaBytes);
-        }
-
-        public string GetSizeString()
-        {
-            var pb = GetSizeInPetaBytes();
-
-            if (pb > 0)
-                return $"{pb} PB";
-
-            var gb = GetSizeInGigaBytes();
-
-            if (gb > 0)
-                return $"{gb} GB";
-
-            var mb = GetSizeInMegaBytes();
-
-            if (mb > 0)
-                return $"{mb} MB";
-
-            var kb = GetSizeInKiloBytes();
-
-            if (kb > 0)
-                return $"{kb} KB";
-
-            return $"{Size} B";
         }
 
         public static bool IsValidFileName(string fileName)

@@ -1,7 +1,5 @@
-﻿using Newtonsoft.Json;
-
-using helpers.Encryption;
-
+﻿using helpers.Encryption;
+using helpers.Json;
 using System;
 using System.IO;
 using System.Text;
@@ -29,12 +27,12 @@ namespace helpers.IO.Binary.Serializers
                 jsonString = Encoding.ASCII.GetString(jsonData);
             }
 
-            return JsonConvert.DeserializeObject(jsonString, type);
+            return JsonHelper.FromJson(jsonString, type);
         }
 
         public override void Serialize(object obj, BinaryWriter writer)
         {
-            var jsonString = JsonConvert.SerializeObject(obj);
+            var jsonString = JsonHelper.ToJson(obj);
             var bytes = Encoding.ASCII.GetBytes(Convert.ToBase64String(Encoding.ASCII.GetBytes(jsonString)));
 
             if (BinarySerialization.Encrypt)

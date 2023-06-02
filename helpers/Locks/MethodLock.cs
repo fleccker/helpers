@@ -10,14 +10,14 @@ public class MethodLock
 
     public bool IsLocked => _isLocked;
     
-    public MethodLock() => _lockedMethod = Reflection.GetExecutingMethod();
+    public MethodLock(int skipFrames = 0) => _lockedMethod = Reflection.GetExecutingMethod(skipFrames);
 
-    public void SetLock(bool status)
+    public void SetLock(bool status, int skipFrames = 0)
     {
-        if (!CanManage())  throw new UnauthorizedAccessException($"This lock can be managed only from {_lockedMethod.Name} (type {_lockedMethod.DeclaringType.FullName})");
+        if (!CanManage(true, skipFrames))  throw new UnauthorizedAccessException($"This lock can be managed only from {_lockedMethod.Name} (type {_lockedMethod.DeclaringType.FullName})");
         else _isLocked = status;
     }
     
-    public void ThrowIfUnauthorized() { if (!CanManage()) throw new UnauthorizedAccessException($"This lock can be managed only from {_lockedMethod.Name} (type {_lockedMethod.DeclaringType.FullName})"); }
-    public bool CanManage(bool shouldSkip = true) => !_isLocked || Reflection.GetExecutingMethod(shouldSkip ? 1 : 0) == _lockedMethod;
+    public void ThrowIfUnauthorized(int skipFrames = 0) { if (!CanManage(true, skipFrames)) throw new UnauthorizedAccessException($"This lock can be managed only from {_lockedMethod.Name} (type {_lockedMethod.DeclaringType.FullName})"); }
+    public bool CanManage(bool shouldSkip = true, int skipFrames = 0) => !_isLocked || Reflection.GetExecutingMethod(shouldSkip ? 1  + skipFrames : skipFrames) == _lockedMethod;
 }

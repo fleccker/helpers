@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+
 using Fasterflect;
 
 namespace helpers.Network.TypeUtils;
@@ -11,7 +12,7 @@ public struct NetworkField
     public bool IsStatic { get; private set; }
     
     public string Name { get; private set; }
-    public string ValueTypeId { get; private set; }
+    public string TypeId { get; private set; }
 
     public static NetworkField Create(MemberInfo member, NetworkTypeRecorder networkTypeRecorder)
     {
@@ -20,7 +21,7 @@ public struct NetworkField
         {
             Type = member.MemberType is MemberTypes.Field ? NetworkFieldType.Field : NetworkFieldType.Property,
             Name = member.Name,
-            ValueTypeId = networkTypeRecorder.GetOrAdd(member.DeclaringType).Id,
+            TypeId = networkTypeRecorder.GetOrAdd(member.DeclaringType).Id,
             IsStatic = member.IsStatic()
         };
     }
