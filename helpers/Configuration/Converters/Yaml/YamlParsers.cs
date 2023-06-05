@@ -8,11 +8,21 @@ namespace helpers.Configuration.Converters.Yaml
         public static ISerializer Serializer { get; } = new SerializerBuilder()
             .WithNamingConvention(NullNamingConvention.Instance)
             .DisableAliases()
+            .ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitEmptyCollections | DefaultValuesHandling.OmitEmptyCollections | DefaultValuesHandling.OmitDefaults)
+            .EnablePrivateConstructors()
+            .IncludeNonPublicProperties()
+            .IgnoreFields()
+            .JsonCompatible()
             .Build();
 
         public static IDeserializer Deserializer { get; } = new DeserializerBuilder()
             .WithNamingConvention(NullNamingConvention.Instance)
             .IgnoreUnmatchedProperties()
+            .IgnoreFields()
+            .EnablePrivateConstructors()
+            .IncludeNonPublicProperties()
+            .WithAttemptingUnquotedStringTypeDeserialization()
+            .WithDuplicateKeyChecking()
             .Build();
     }
 }

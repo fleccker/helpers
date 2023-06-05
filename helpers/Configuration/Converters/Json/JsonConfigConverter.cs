@@ -7,18 +7,10 @@ namespace helpers.Configuration.Converters.Json
     public class JsonConfigConverter : IConfigConverter
     {
         public bool Indent { get; set; }
-
         public string TypeName { get; } = "JSON";
 
-        public JsonConfigConverter() 
-        {
-            Indent = true;
-        }
-
-        public JsonConfigConverter(bool indent)
-        {
-            Indent = indent;
-        }
+        public JsonConfigConverter() => Indent = true;
+        public JsonConfigConverter(bool indent) => Indent = indent;
 
         public bool TryConvert(string value, Type type, out object result)
         {

@@ -1,4 +1,5 @@
 ﻿using helpers.Extensions;
+using helpers.Pooling.Exceptions;
 
 using System;
 using System.Collections.Concurrent;
@@ -23,7 +24,7 @@ namespace helpers.Pooling
 
         public ConcurrentQueue<T> Queue { get; private set; }
 
-        public PoolMode Mode { get; set; } = PoolMode.DefaultOnEmpty;
+        public PoolMode Mode { get; set; } = PoolMode.NewOnEmpty;
 
         public void Destroy()
         {
@@ -46,10 +47,9 @@ namespace helpers.Pooling
         {
             if (!Queue.TryDequeue(out var value))
             {
-                if (Mode is PoolMode.DefaultOnEmpty || _constructor is null)
-                    value = default;
-                else
-                    value = _constructor.Invoke();
+                if (Mode is PoolMode.ThrowOnEmpty) throw new PoolEmptyException(typeof(Pool<T>));
+                else if (Mode is PoolMode.DefaultOnEmpty || _constructor is null) value = default;
+                else value = _constructor.Invoke();
             }
 
             _prepareToGet?.Invoke(value);

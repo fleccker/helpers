@@ -5,7 +5,7 @@ namespace helpers.Timeouts
 {
     public struct RepeatedHandle
     {
-        private Action _delegate;
+        private volatile Action _delegate;
         private Timeout _timeout;
         private Thread _thread;
         private CancellationTokenSource _tokenSource;

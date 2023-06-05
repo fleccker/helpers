@@ -1,27 +1,49 @@
 ﻿using helpers.Pooling.Pools;
+using helpers.Random;
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Collections.Concurrent;
-using helpers.Random;
 using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace helpers.Extensions
 {
     [LogSource("Collection Extensions")]
     public static class CollectionExtensions
     {
+        public static TEnumerable To<TEnumerable>(this IEnumerable values) where TEnumerable : IEnumerable
+        {
+            if (values is TEnumerable targetEnumerable) return targetEnumerable;
+            return default;
+        }
+
         public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> collection)
         {
             var dict = new Dictionary<TKey, TValue>();
 
             foreach (var pair in collection)
             {
-                if (dict.ContainsKey(pair.Key))
-                    dict[pair.Key] = pair.Value;
-                else
-                    dict.Add(pair.Key, pair.Value);
+                if (pair.Key is null) continue;
+                if (dict.ContainsKey(pair.Key)) dict[pair.Key] = pair.Value;
+                else dict.Add(pair.Key, pair.Value);
+            }
+
+            return dict;
+        }
+
+        public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this IEnumerable<TValue> values, Func<TValue, TKey> keySelector)
+        {
+            if (keySelector is null) throw new ArgumentNullException($"This method requires the key selector.");
+
+            var dict = new Dictionary<TKey, TValue>();
+
+            foreach (var value in values)
+            {
+                var key = keySelector(value);
+                if (key is null) continue;
+
+                dict[key] = value;
             }
 
             return dict;
@@ -62,6 +84,101 @@ namespace helpers.Extensions
             }
         }
 
+        public static bool TryGetFirst<T>(this IEnumerable<T> values, Func<T, bool> predicate, out T value)
+        {
+            if (predicate is null) throw new ArgumentNullException($"This method requires the predicate to be present!");
+
+            foreach (var val in values)
+            {
+                if (predicate(val))
+                {
+                    value = val;
+                    return true;
+                }
+            }
+
+            value = default;
+            return false;
+        }
+
+        public static bool TryGetFirst<T>(this IEnumerable values, Func<T, bool> predicate, out T value)
+        {
+            if (predicate is null) throw new ArgumentNullException($"This method requires the predicate to be present!");
+
+            foreach (var val in values)
+            {
+                if (val is null) continue;
+                if (!(val is T t)) continue;
+                if (t is null) continue;
+                if (!predicate(t)) continue;
+
+                value = t;
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+        public static bool TryGetFirst<T>(this IEnumerable values, out T value)
+        {
+            foreach (var val in values)
+            {
+                if (val is null) continue;
+                if (!(val is T t)) continue;
+                if (t is null) continue;
+
+                value = t;
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+        public static List<T> Where<T>(this IEnumerable collection, bool addNull = false, Func<T, bool> predicate = null)
+        {
+            var list = new List<T>();
+
+            foreach (var obj in collection)
+            {
+                if (obj is null)
+                {
+                    if (addNull) list.Add(default);
+                    else continue;
+                }
+
+                if (!(obj is T t)) continue;
+                if (t is null) continue;
+                if (predicate != null && !predicate(t)) continue;
+
+                list.Add(t);
+            }
+
+            return list;
+        }
+
+        public static List<TType> WhereNot<TFilter, TType>(this IEnumerable collection, bool addNull = false, Func<TType, bool> predicate = null)
+        {
+            var list = new List<TType>();
+
+            foreach (var obj in collection)
+            {
+                if (obj is null)
+                {
+                    if (addNull) list.Add(default);
+                    else continue;
+                }
+
+                if (obj is TFilter) continue;
+                if (predicate != null && predicate((TType)obj)) continue;
+
+                list.Add((TType)obj);
+            }
+
+            return list;
+        }
+
         public static bool TryPeekIndex<T>(this T[] array, int index, out T value)
         {
             if (index >= array.Length)
@@ -88,8 +205,7 @@ namespace helpers.Extensions
 
         public static bool Match<T>(this IEnumerable<T> source, IEnumerable<T> target)
         {
-            if (source.Count() != target.Count())
-                return false;
+            if (source.Count() != target.Count()) return false;
 
             for (int i = 0; i < source.Count(); i++)
             {
@@ -98,14 +214,11 @@ namespace helpers.Extensions
 
                 if (item is object itemObj && targetItem is object targetObj)
                 {
-                    if (itemObj is null && targetObj is null)
-                        continue;
+                    if (itemObj is null && targetObj is null) continue;
                 }
 
-                if (item.Equals(targetItem))
-                    continue;
-                else
-                    return false;
+                if (item.Equals(targetItem)) continue;
+                else return false;
             }
 
             return true;
@@ -136,6 +249,16 @@ namespace helpers.Extensions
         }
 
         public static bool Any(this IEnumerable collection) => collection.Count() > 0;
+        public static bool Any<TType>(this IEnumerable collection)
+        {
+            foreach (var item in collection)
+            {
+                if (item is null) continue;
+                if (item is TType) return true;
+            }
+
+            return false;
+        }
 
         public static void Shuffle<T>(this ICollection<T> source)
         {
@@ -155,8 +278,7 @@ namespace helpers.Extensions
 
             source.Clear();
 
-            foreach (var value in copy)
-                source.Add(value);
+            foreach (var value in copy) source.Add(value);
 
             ListPool<T>.Pool.Push(copy);
         }

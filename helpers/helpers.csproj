@@ -73,6 +73,9 @@
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
     </Reference>
+    <Reference Include="System.CodeDom, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.CodeDom.8.0.0-preview.4.23259.5\lib\net462\System.CodeDom.dll</HintPath>
+    </Reference>
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
@@ -116,7 +119,7 @@
       <HintPath>..\packages\SystemInfoLibrary-devel.1.5.0.25\lib\net45\SystemInfoLibrary.dll</HintPath>
     </Reference>
     <Reference Include="UnitsNet, Version=5.0.0.0, Culture=neutral, PublicKeyToken=f8601875a1f041da, processorArchitecture=MSIL">
-      <HintPath>..\packages\UnitsNet.5.16.0\lib\netstandard2.0\UnitsNet.dll</HintPath>
+      <HintPath>..\packages\UnitsNet.5.17.0\lib\netstandard2.0\UnitsNet.dll</HintPath>
     </Reference>
     <Reference Include="WatsonTcp, Version=5.1.2.0, Culture=neutral, PublicKeyToken=c61f5f04303a13b3, processorArchitecture=MSIL">
       <HintPath>..\packages\WatsonTcp.5.1.2\lib\net48\WatsonTcp.dll</HintPath>
@@ -127,14 +130,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\Converters\Json\JsonConfigConverter.cs" />
-    <Compile Include="Configuration\IniConfigAttribute.cs" />
-    <Compile Include="Configuration\IniConfigBuilder.cs" />
+    <Compile Include="Configuration\Ini\IniConfigAttribute.cs" />
+    <Compile Include="Configuration\Ini\IniConfigBuilder.cs" />
     <Compile Include="Configuration\Converters\Yaml\YamlConfigConverter.cs" />
     <Compile Include="Configuration\Converters\Yaml\YamlParsers.cs" />
     <Compile Include="Configuration\Converters\IConfigConverter.cs" />
-    <Compile Include="Configuration\IniConfigHandler.cs" />
-    <Compile Include="Configuration\IniConfigReader.cs" />
-    <Compile Include="Configuration\IniConfigWriter.cs" />
+    <Compile Include="Configuration\Ini\IniConfigHandler.cs" />
+    <Compile Include="Configuration\Ini\IniConfigReader.cs" />
+    <Compile Include="Configuration\Ini\IniConfigWriter.cs" />
+    <Compile Include="Configuration\Register\RegisterConfigBase.cs" />
+    <Compile Include="Configuration\Register\RegisterConfigHandler.cs" />
+    <Compile Include="Configuration\Register\RegisterConfigReader.cs" />
+    <Compile Include="Configuration\Register\RegisterConfigUtils.cs" />
+    <Compile Include="Configuration\Register\RegisterConfigWriter.cs" />
     <Compile Include="ConsoleUtils.cs" />
     <Compile Include="Encryption\Encryptor.cs" />
     <Compile Include="Events\EventManager.cs" />
@@ -165,18 +173,78 @@
     <Compile Include="Logging\Loggers\FileLoggerMode.cs" />
     <Compile Include="LogLevel.cs" />
     <Compile Include="LogSourceAttribute.cs" />
-    <Compile Include="Network\NetworkClient.cs" />
-    <Compile Include="Network\NetworkServer.cs" />
-    <Compile Include="Network\NetworkTransport.cs" />
-    <Compile Include="Network\TypeUtils\NetworkField.cs" />
-    <Compile Include="Network\TypeUtils\NetworkFieldType.cs" />
-    <Compile Include="Network\TypeUtils\NetworkType.cs" />
-    <Compile Include="Network\TypeUtils\NetworkTypeRecorder.cs" />
+    <Compile Include="Network\Authentification\AuthentificationData.cs" />
+    <Compile Include="Network\Authentification\AuthentificationFailureReason.cs" />
+    <Compile Include="Network\Authentification\AuthentificationStatus.cs" />
+    <Compile Include="Network\Authentification\IAuthentificationData.cs" />
+    <Compile Include="Network\Authentification\IAuthentificationStorage.cs" />
+    <Compile Include="Network\Authentification\KeyAuthentification.cs" />
+    <Compile Include="Network\Authentification\Messages\AuthentificationRequestMessage.cs" />
+    <Compile Include="Network\Authentification\Messages\AuthentificationResponseMessage.cs" />
+    <Compile Include="Network\Authentification\Storage\KeyFileStorage.cs" />
+    <Compile Include="Network\Blocking\BlockMode.cs" />
+    <Compile Include="Network\Blocking\IBlock.cs" />
+    <Compile Include="Network\Callbacks\NetworkCallbackManager.cs" />
+    <Compile Include="Network\Controllers\Client\ClientController.cs" />
+    <Compile Include="Network\Controllers\ControllerExtensions.cs" />
+    <Compile Include="Network\Controllers\ControllerType.cs" />
+    <Compile Include="Network\Controllers\Server\ServerController.cs" />
+    <Compile Include="Network\Data\DataManagerSettings.cs" />
+    <Compile Include="Network\Data\DataMode.cs" />
+    <Compile Include="Network\Data\DataPack.cs" />
+    <Compile Include="Network\Data\IDataManager.cs" />
+    <Compile Include="Network\Data\IDataTarget.cs" />
+    <Compile Include="Network\Data\InternalData\RemoteSpeficicationsRequest.cs" />
+    <Compile Include="Network\Data\Managers\DataManager.cs" />
+    <Compile Include="Network\Data\SerilizableBase.cs" />
+    <Compile Include="Network\Events\Client\ClientEvents.cs" />
+    <Compile Include="Network\Events\Client\ClientEventType.cs" />
+    <Compile Include="Network\Events\INetworkEventCollection.cs" />
+    <Compile Include="Network\Events\Server\ServerEvents.cs" />
+    <Compile Include="Network\Events\Server\ServerEventType.cs" />
+    <Compile Include="Network\Extensions\Data\ReaderExtensions.cs" />
+    <Compile Include="Network\Extensions\Data\WriterExtensions.cs" />
+    <Compile Include="Network\Features\FeatureExtensions.cs" />
+    <Compile Include="Network\Features\NetworkFeatureBase.cs" />
+    <Compile Include="Network\Features\NetworkFeatureManager.cs" />
+    <Compile Include="Network\Callbacks\INetworkCallbackManager.cs" />
+    <Compile Include="Network\Controllers\INetworkController.cs" />
+    <Compile Include="Network\Features\INetworkFeature.cs" />
+    <Compile Include="Network\Features\INetworkFeatureManager.cs" />
+    <Compile Include="Network\INetworkObject.cs" />
+    <Compile Include="Network\Peers\INetworkPeer.cs" />
+    <Compile Include="Network\Authentification\IAuthentification.cs" />
+    <Compile Include="Network\Reconnection\Reconnector.cs" />
+    <Compile Include="Network\Requests\IRequest.cs" />
+    <Compile Include="Network\Requests\RequestBase.cs" />
+    <Compile Include="Network\Requests\RequestExtensions.cs" />
+    <Compile Include="Network\Requests\RequestManager.cs" />
+    <Compile Include="Network\Requests\IResponse.cs" />
+    <Compile Include="Network\Requests\ResponseBase.cs" />
+    <Compile Include="Network\Requests\ResponseExtensions.cs" />
+    <Compile Include="Network\Targets\INetworkTarget.cs" />
+    <Compile Include="Network\Data\ISerializable.cs" />
+    <Compile Include="Network\NetworkOperation.cs" />
+    <Compile Include="Network\Peers\NetworkPeerStatus.cs" />
+    <Compile Include="Network\Data\InternalData\RemoteSpecifications.cs" />
+    <Compile Include="Network\Peers\Server\ServerSidePeer.cs" />
+    <Compile Include="Network\Reconnection\IReconnector.cs" />
+    <Compile Include="Network\Reconnection\ReconnectionState.cs" />
+    <Compile Include="Network\Requests\IRequestManager.cs" />
+    <Compile Include="Network\Synchronization\ISynchronizationManager.cs" />
+    <Compile Include="Network\Synchronization\ISynchronizationTarget.cs" />
+    <Compile Include="Network\Synchronization\ISynchronizationValidator.cs" />
+    <Compile Include="Network\Synchronization\SynchronizationData.cs" />
+    <Compile Include="Network\Synchronization\SynchronizationMode.cs" />
+    <Compile Include="Network\Targets\Ip\IpTarget.cs" />
+    <Compile Include="Network\Targets\Ip\IpTargets.cs" />
     <Compile Include="ObjectCollection.cs" />
+    <Compile Include="Pooling\Exceptions\PoolEmptyException.cs" />
     <Compile Include="Pooling\Pool.cs" />
     <Compile Include="CurrentSystem.cs" />
     <Compile Include="DisposableBase.cs" />
     <Compile Include="Pooling\PoolMode.cs" />
+    <Compile Include="Pooling\Pools\DataPackPool.cs" />
     <Compile Include="Pooling\Pools\DictionaryPool.cs" />
     <Compile Include="Pooling\Pools\HashSetPool.cs" />
     <Compile Include="Pooling\Pools\ListPool.cs" />
@@ -223,7 +291,9 @@
   <ItemGroup>
     <Compile Include="Locks\MethodLock.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Network\Blocking\IpBlocking\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

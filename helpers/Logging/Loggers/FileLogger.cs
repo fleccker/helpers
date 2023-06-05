@@ -133,10 +133,7 @@ namespace helpers.Logging.Loggers
             }
         }
 
-        private void TimerCallback(object state)
-        {
-            Flush();
-        }
+        private void TimerCallback(object state) => Flush();
 
         public static string DefaultFilePath() => $"{DirectoryManager.Roaming}/logs/{DefaultFileName()}";
         public static string DefaultFileName() => FileManager.FixFilePath($"Output Log - {DateTime.Now.ToString("G")}.txt");

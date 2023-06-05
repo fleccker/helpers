@@ -21,6 +21,8 @@ namespace helpers.Random
         public virtual byte GetRandom(byte minValue, byte maxValue) => _randomGenerationEngine.GetRandomValue(minValue, maxValue);
         public virtual bool GetBool() => GetRandom(0, 1) == 1;
 
+        public virtual string GetReadableString(int length) => Convert.ToBase64String(GenerateBytes(length).ToArray());
+
         public virtual string GetString(int length, Action<string> finishString = null)
         {
             var str = "";
@@ -43,12 +45,12 @@ namespace helpers.Random
 
             for (int i = 0; i < size; i++)
             {
-                if (mode is RandomListGenerationMode.AllowMultiple) list[i] = GetRandom(minElementSize, maxElementSize);
+                if (mode is RandomListGenerationMode.AllowMultiple) list.Add(GetRandom(minElementSize, maxElementSize));
                 else
                 {
                     var nextByte = GetRandom(minElementSize, maxElementSize);
                     while (list.Contains(nextByte)) nextByte = GetRandom(minElementSize, maxElementSize);
-                    list[i] = nextByte;
+                    list.Add(nextByte);
                 }
             }
 
@@ -61,12 +63,12 @@ namespace helpers.Random
 
             for (int i = 0; i < size; i++)
             {
-                if (mode is RandomListGenerationMode.AllowMultiple) list[i] = GetRandom(minElementSize, maxElementSize);
+                if (mode is RandomListGenerationMode.AllowMultiple) list.Add(GetRandom(minElementSize, maxElementSize));
                 else
                 {
                     var nextInt = GetRandom(minElementSize, maxElementSize);
                     while (list.Contains(nextInt)) nextInt = GetRandom(minElementSize, maxElementSize);
-                    list[i] = nextInt;
+                    list.Add(nextInt);
                 }
             }
 

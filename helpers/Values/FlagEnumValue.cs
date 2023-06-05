@@ -96,6 +96,8 @@ namespace helpers.Values
             }
         }
 
+        public bool HasFlag(T flag) => _flagValue.HasFlag(flag);
+
         public FlagEnumValue<T> WithDefaultFlags(T flags)
         {
             _defaultFlags = flags;

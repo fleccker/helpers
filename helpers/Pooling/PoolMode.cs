@@ -3,6 +3,7 @@
     public enum PoolMode
     {
         DefaultOnEmpty,
-        NewOnEmpty
+        NewOnEmpty,
+        ThrowOnEmpty
     }
 }

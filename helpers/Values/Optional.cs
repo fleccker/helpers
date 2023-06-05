@@ -1,43 +1,30 @@
 ﻿namespace helpers.Values
 {
     [LogSource("Optional Value")]
-    public class Optional<TValue>
+    public struct Optional<TValue>
     {
         private TValue _value;
-        private bool _isNull;
+        private bool _isNull = true;
 
-        public bool HasValue { get => !_isNull; }
-
+        public bool HasValue => !_isNull;
         public TValue Value
         {
             get
             {
-                if (_isNull)
-                    return default;
-
-                return _value;
+                if (_isNull) return default;
+                else return _value;
             }
         }
 
         public void SetValue(TValue value)
         {
             _value = value;
-            _isNull = false;
+            _isNull = value is null;
         }
 
-        internal Optional(TValue value) { _value = value; }
-        internal Optional() { _isNull = true; }
+        internal Optional(TValue value) => _value = value;
 
-        public static Optional<TValue> FromValue(TValue value)
-            => new Optional<TValue>(value);
-
-        public static Optional<TValue> FromNull()
-            => new Optional<TValue>();
-
-        public static void Ensure<T>(ref Optional<T> optional)
-        {
-            if (optional is null)
-                optional = Optional<T>.FromNull();
-        }
+        public static Optional<TValue> FromValue(TValue value) => new Optional<TValue>(value);
+        public static Optional<TValue> Null => new Optional<TValue>();
     }
 }

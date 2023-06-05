@@ -1,6 +1,6 @@
 ﻿using helpers.Pooling.Pools;
+
 using System;
-using System.Reflection;
 
 namespace helpers.Logging
 {
