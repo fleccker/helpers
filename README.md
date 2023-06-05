@@ -20,17 +20,11 @@ Unless you want to use literally any JSON feature (like the IO.Binary interface 
 
 With that said, I use these libraries:
 - [WatsonTcp](https://github.com/jchristn/WatsonTcp)
-- [ByteSize](https://github.com/omar/ByteSize)
 - [Costura](https://github.com/Fody/Costura)
 - [Enums.NET](https://github.com/TylerBrinkley/Enums.NET)
-- Fasm.NET
 - [Fasterflect](https://github.com/buunguyen/fasterflect)
 - [FastGenericNew](https://github.com/Nyrest/FastGenericNew)
 - [Fody](https://github.com/Fody/Fody)
 - The amazing [Harmony](https://github.com/pardeike/Harmony) library
-- [MemorySharp](https://github.com/JamesMenetrey/MemorySharp)
-- [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
-- [Pose](https://github.com/tonerdo/pose)
-- [SharpCompress](https://github.com/adamhathcock/sharpcompress)
 - [UnitsNet](https://github.com/angularsen/UnitsNet)
 - [YamlDotNet](https://github.com/aaubry/YamlDotNet)
