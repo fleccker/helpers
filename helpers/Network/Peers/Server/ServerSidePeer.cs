@@ -6,7 +6,6 @@ using helpers.Network.Features;
 using helpers.Network.Targets.Ip;
 using helpers.Network.Callbacks;
 using helpers.Network.Requests;
-using helpers.Network.Interfaces;
 using helpers.Network.Data.InternalData;
 
 using System;

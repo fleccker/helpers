@@ -14,15 +14,21 @@ namespace helpers.Configuration.Converters.Json
 
         public bool TryConvert(string value, Type type, out object result)
         {
-            if (value == "null")  result = null;
-            else result = JsonHelper.FromJson(value, type);
+            if (value == "null") 
+                result = null;
+            else 
+                result = JsonHelper.FromJson(value, type);
+
             return true;
         }
 
         public bool TryConvert(object value, out string result)
         {
-            if (value is null) result = "null";
-            else result = Indent ? JsonHelper.ToJson(value) : JsonHelper.ToJson(value, JsonOptionsBuilder.Default.WithIndented(false));
+            if (value is null) 
+                result = "null";
+            else 
+                result = Indent ? JsonHelper.ToJson(value) : JsonHelper.ToJson(value, JsonOptionsBuilder.NotIndented);
+
             return true;
         }
     }

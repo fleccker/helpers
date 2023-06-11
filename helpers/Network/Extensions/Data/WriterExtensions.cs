@@ -48,7 +48,7 @@ namespace helpers.Network.Extensions.Data
                 }
                 else
                 {
-                    var json = JsonHelper.ToJson(obj, JsonOptionsBuilder.Default.WithIndented(false));
+                    var json = JsonHelper.ToJson(obj, JsonOptionsBuilder.NotIndented);
                     var data = Encoding.ASCII.GetBytes(json);
 
                     writer.Write(data.Length);

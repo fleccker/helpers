@@ -1,14 +1,12 @@
 ﻿using helpers.Network.Features;
-using helpers.Network.Interfaces;
 using helpers.Network.Peers;
 using helpers.Network.Authentification.Messages;
+using helpers.Network.Authentification.Storage;
 using helpers.Network.Requests;
+using helpers.Network.Events;
 
 using System;
 using System.Timers;
-using helpers.Network.Events;
-using helpers.Network.Controllers;
-using helpers.Network.Authentification.Storage;
 using System.IO;
 
 namespace helpers.Network.Authentification

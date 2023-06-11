@@ -2,7 +2,7 @@
 using helpers.Network.Peers;
 using helpers.Network.Features;
 using helpers.Network.Targets;
-using helpers.Network.Interfaces;
+using helpers.Network.Authentification;
 
 using System;
 using System.Collections.Generic;

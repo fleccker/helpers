@@ -5,8 +5,11 @@ namespace helpers
     [LogSource("Console Utils")]
     public static class ConsoleUtils
     {
-        public static bool TryReadInput<T>(out T inputValue)
+        public static bool TryReadInput<T>(string message, out T inputValue)
         {
+            if (!string.IsNullOrWhiteSpace(message))
+                Log.Show(LogLevel.Info, "Console", message);
+
             var input = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(input))
             {
@@ -25,8 +28,11 @@ namespace helpers
             return true;
         }
 
-        public static bool TryReadInput<T>(Func<string, T> parser, out T inputValue)
+        public static bool TryReadInput<T>(string message, Func<string, T> parser, out T inputValue)
         {
+            if (!string.IsNullOrWhiteSpace(message))
+                Log.Show(LogLevel.Info, "Console", message);
+
             var input = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(input))
             {

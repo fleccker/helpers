@@ -1,4 +1,5 @@
 ﻿using helpers.Extensions;
+using helpers.Parsers.Log;
 
 using System;
 using System.Collections.Concurrent;
@@ -55,16 +56,21 @@ namespace helpers.Logging
             if (string.IsNullOrWhiteSpace(strLine))
                 strLine = "empty";
 
+            if (strLine.HasHtmlTags(out var openIndexes, out var closeIndexes) && LogParser.TryParse(strLine, out var tags))
+            {
+                tags.ForEach(tag =>
+                {
+                    var color = ConsoleColor.Green;
+
+                    Enum.TryParse(tag.Value, true, out color);
+
+                    _log.Enqueue(new Tuple<ConsoleColor, string>(color, tag.StringValue));
+                });
+
+                return this;
+            }
+
             _log.Enqueue(new Tuple<ConsoleColor, string>(color.Value, strLine));
-            return this;
-        }
-
-        public LogBuilder WithTimestamp(char openBracket = '[', char closeBracket = ']', ConsoleColor? color = null)
-        {
-            if (!color.HasValue)
-                color = DefaultColor;
-
-            _log.Enqueue(new Tuple<ConsoleColor, string>(color.Value, $"{openBracket}{DateTime.Now.ToString("t")}{closeBracket}"));
             return this;
         }
 

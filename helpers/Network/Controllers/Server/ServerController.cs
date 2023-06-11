@@ -1,7 +1,7 @@
 ﻿using helpers.Network.Events;
 using helpers.Network.Events.Server;
 using helpers.Network.Features;
-using helpers.Network.Interfaces;
+using helpers.Network.Authentification;
 using helpers.Network.Peers.Server;
 using helpers.Network.Targets.Ip;
 using helpers.Network.Data;
@@ -11,7 +11,6 @@ using helpers.Network.Callbacks;
 using helpers.Network.Targets;
 using helpers.Pooling.Pools;
 using helpers.Extensions;
-using helpers.Network.Authentification;
 
 using System.Collections.Generic;
 using System.IO;

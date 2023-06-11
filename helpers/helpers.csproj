@@ -19,9 +19,9 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
+    <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>
     </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -33,7 +33,8 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -239,6 +240,11 @@
     <Compile Include="Network\Targets\Ip\IpTarget.cs" />
     <Compile Include="Network\Targets\Ip\IpTargets.cs" />
     <Compile Include="ObjectCollection.cs" />
+    <Compile Include="Parsers\Log\LogParser.cs" />
+    <Compile Include="Parsers\Log\LogTag.cs" />
+    <Compile Include="Parsers\String\StringParser.cs" />
+    <Compile Include="Parsers\String\StringParserPart.cs" />
+    <Compile Include="Parsers\String\StringParserUtils.cs" />
     <Compile Include="Pooling\Exceptions\PoolEmptyException.cs" />
     <Compile Include="Pooling\Pool.cs" />
     <Compile Include="CurrentSystem.cs" />
@@ -256,6 +262,9 @@
     <Compile Include="Random\RandomListGenerationMode.cs" />
     <Compile Include="Random\WeightedObject.cs" />
     <Compile Include="Random\WeightedRandomGeneration.cs" />
+    <Compile Include="Results\ErrorResult.cs" />
+    <Compile Include="Results\IResult.cs" />
+    <Compile Include="Results\SuccessResult.cs" />
     <Compile Include="Services\ServiceBase.cs" />
     <Compile Include="Services\ServiceCollection.cs" />
     <Compile Include="Services\IService.cs" />
@@ -263,6 +272,14 @@
     <Compile Include="Singleton.cs" />
     <Compile Include="Timeouts\RepeatedHandle.cs" />
     <Compile Include="Timeouts\Timeout.cs" />
+    <Compile Include="Translations\Entries\StringEntry.cs" />
+    <Compile Include="Translations\Exceptions\TranslationEntryNotFoundException.cs" />
+    <Compile Include="Translations\Translation.cs" />
+    <Compile Include="Translations\TranslationExtensions.cs" />
+    <Compile Include="Translations\TranslationReader.cs" />
+    <Compile Include="Translations\ITranslationEntry.cs" />
+    <Compile Include="Translations\TranslationWriter.cs" />
+    <Compile Include="Translations\Translator.cs" />
     <Compile Include="TypeInstantiator.cs" />
     <Compile Include="TypeInstantiatorMap.cs" />
     <Compile Include="Values\FlagEnumValue.cs" />

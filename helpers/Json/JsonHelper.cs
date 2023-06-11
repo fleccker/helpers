@@ -9,13 +9,17 @@ namespace helpers.Json
     {
         public static string ToJson(this object obj, JsonOptionsBuilder options = null)
         {
-            if (options is null) options = JsonOptionsBuilder.Default;
+            if (options is null) 
+                options = JsonOptionsBuilder.Indented;
+
             return JsonSerializer.Serialize(obj, obj.GetType(), options.ToOptions());
         }
 
         public static async Task<string> ToJsonAsync(this object obj, JsonOptionsBuilder options = null)
         {
-            if (options is null) options = JsonOptionsBuilder.Default;
+            if (options is null) 
+                options = JsonOptionsBuilder.Indented;
+
             string serialized = null;
 
             using (var memoryStream = new MemoryStream())
@@ -30,8 +34,10 @@ namespace helpers.Json
 
         public static string ToJsonNull(this Type type, JsonOptionsBuilder options = null)
         {
-            if (options is null) options = JsonOptionsBuilder.Default;
-            return JsonSerializer.Serialize((object)null, type, options.ToOptions());
+            if (options is null) 
+                options = JsonOptionsBuilder.Indented;
+
+            return JsonSerializer.Serialize((object?)null, type, options.ToOptions());
         }
 
         public static object FromJson(this string json, Type type) => JsonSerializer.Deserialize(json, type);

@@ -1,10 +1,9 @@
-﻿using helpers.Network.Authentification;
-using helpers.Network.Features;
+﻿using helpers.Network.Features;
 using helpers.Network.Peers;
 
 using System;
 
-namespace helpers.Network.Interfaces
+namespace helpers.Network.Authentification
 {
     public interface IAuthentification : INetworkFeature
     {

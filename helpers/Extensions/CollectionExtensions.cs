@@ -12,9 +12,61 @@ namespace helpers.Extensions
     [LogSource("Collection Extensions")]
     public static class CollectionExtensions
     {
-        public static TEnumerable To<TEnumerable>(this IEnumerable values) where TEnumerable : IEnumerable
+        public static TEnumerable To<TEnumerable>(this IEnumerable values, Func<object, object> keySelector = null) where TEnumerable : IEnumerable
         {
             if (values is TEnumerable targetEnumerable) return targetEnumerable;
+            else if (typeof(TEnumerable).IsArray)
+            {
+                var array = Reflection.Instantiate<TEnumerable>() as Array;
+                var index = 0;
+
+                foreach (var value in values)
+                {
+                    array.SetValue(value, index);
+                    index++;
+                }
+
+                return array.As<TEnumerable>();
+            }
+            else if (typeof(TEnumerable).IsDictionary())
+            {
+                if (values is IDictionary dictionary)
+                {
+                    var targetDict = Reflection.Instantiate<TEnumerable>() as IDictionary;
+
+                    foreach (var key in dictionary.Keys)
+                    {
+                        targetDict[key] = dictionary[key];
+                    }
+
+                    return targetDict.As<TEnumerable>();
+                }
+                else
+                {
+                    var targetDict = Reflection.Instantiate<TEnumerable>() as IDictionary;
+
+                    foreach (var value in values)
+                    {
+                        var key = keySelector?.Invoke(value);
+                        if (key is null)
+                            continue;
+
+                        targetDict[key] = value;
+                    }
+
+                    return targetDict.As<TEnumerable>();
+                }
+            }
+            else
+            {
+                var collection = Reflection.Instantiate<TEnumerable>();
+                if (!(collection is IList list))
+                    throw new InvalidOperationException($"Collection of type {typeof(TEnumerable).FullName} is not supported.");
+
+                list.AddRange(values);
+
+                return list.As<TEnumerable>();
+            }
             return default;
         }
 
@@ -281,6 +333,14 @@ namespace helpers.Extensions
             foreach (var value in copy) source.Add(value);
 
             ListPool<T>.Pool.Push(copy);
+        }
+
+        public static void AddRange(this IList destination, IEnumerable source)
+        {
+            foreach (var item in source)
+            {
+                destination.Add(item);
+            }
         }
 
         public static void AddRange<T>(this ICollection<T> destination, IEnumerable<T> source)

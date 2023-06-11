@@ -4,9 +4,16 @@ using System.Threading.Tasks;
 
 namespace helpers
 {
+    /// <summary>
+    ///   <br />
+    /// </summary>
     [LogSource("Waiter")]
     public static class Waiter
     {
+        /// <summary>
+        /// Waits the block.
+        /// </summary>
+        /// <param name="time">The time.</param>
         public static void WaitBlock(int time)
         {
             if (time <= 0)
@@ -15,6 +22,11 @@ namespace helpers
             Thread.Sleep(time);
         }
 
+        /// <summary>
+        /// Waits the non block.
+        /// </summary>
+        /// <param name="time">The time.</param>
+        /// <param name="callback">The callback.</param>
         public static void WaitNonBlock(int time, Action callback)
         {
             Task.Run(async () =>
@@ -25,9 +37,15 @@ namespace helpers
             });
         }
 
+        /// <summary>
+        /// Waits for method non block.
+        /// </summary>
+        /// <param name="method">The method.</param>
+        /// <param name="callback">The callback.</param>
+        /// <param name="timeout">The timeout.</param>
         public static void WaitForMethodNonBlock(Action method, Action<bool> callback, int timeout = -1)
         {
-            Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 var curTime = 0;
 
@@ -35,7 +53,7 @@ namespace helpers
                 {
                     var finished = false;
 
-                    Task.Run(() =>
+                    _ = Task.Run(() =>
                     {
                         method?.Invoke();
                         finished = true;
@@ -63,9 +81,15 @@ namespace helpers
             });
         }
 
+        /// <summary>
+        /// Waits the for method non block.
+        /// </summary>
+        /// <param name="method">The method.</param>
+        /// <param name="callback">The callback.</param>
+        /// <param name="timeout">The timeout.</param>
         public static void WaitForMethodNonBlock<T>(Func<T> method, Action<bool, T> callback, int timeout = -1)
         {
-            Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 var curTime = 0;
                 T res = default;
@@ -74,7 +98,7 @@ namespace helpers
                 {
                     var finished = false;
 
-                    Task.Run(() =>
+                    _ = Task.Run(() =>
                     {
                         res = method.Invoke();
                         finished = true;
@@ -102,6 +126,12 @@ namespace helpers
             });
         }
 
+        /// <summary>
+        /// Waits the for task non block.
+        /// </summary>
+        /// <param name="task">The task.</param>
+        /// <param name="callback">The callback.</param>
+        /// <param name="timeout">The timeout.</param>
         public static void WaitForTaskNonBlock(Task task, Action<bool> callback, int timeout = -1)
         {
             Task.Run(async () =>
@@ -112,11 +142,7 @@ namespace helpers
                 {
                     var finished = false;
 
-                    Task.Run(async () =>
-                    {
-                        await task;
-                        finished = true;
-                    });
+                    _ = Task.Run(async () => { await task; finished = true; });
 
                     while (!finished)
                     {
@@ -140,6 +166,13 @@ namespace helpers
             });
         }
 
+        /// <summary>
+        /// Waits for task non block.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="task">The task.</param>
+        /// <param name="callback">The callback.</param>
+        /// <param name="timeout">The timeout.</param>
         public static void WaitForTaskNonBlock<T>(Task<T> task, Action<bool, T> callback, int timeout = -1)
         {
             Task.Run(async () =>
@@ -151,11 +184,7 @@ namespace helpers
                 {
                     var finished = false;
 
-                    Task.Run(async () =>
-                    {
-                        res = await task;
-                        finished = true;
-                    });
+                    _ = Task.Run(async () => { res = await task; finished = true; });
 
                     while (!finished)
                     {

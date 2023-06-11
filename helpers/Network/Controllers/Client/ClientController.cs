@@ -7,7 +7,6 @@ using helpers.Network.Data.Managers;
 using helpers.Network.Events;
 using helpers.Network.Events.Client;
 using helpers.Network.Features;
-using helpers.Network.Interfaces;
 using helpers.Network.Peers;
 using helpers.Network.Reconnection;
 using helpers.Network.Requests;
