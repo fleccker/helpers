@@ -117,7 +117,7 @@ namespace helpers.IO.Binary
 
         public static bool TryGetSerializer(Type type, out BinarySerializerBase serializer)
         {
-            if (Reflection.HasInterface<IBinarySerializable>(type, true))
+            if (Reflection.HasInterface<IBinarySerializable>(type))
                 type = typeof(IBinarySerializable);
             else if (Reflection.IsDictionary(type))
                 type = typeof(IDictionary);

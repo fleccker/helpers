@@ -130,6 +130,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Analyzors\Instantiation\ConstructorTypeInstantiator.cs" />
+    <Compile Include="Analyzors\Instantiation\ITypeInstantiator.cs" />
+    <Compile Include="Analyzors\Instantiation\TypeInstanceAttribute.cs" />
+    <Compile Include="Analyzors\Instantiation\TypeInstanceProperty.cs" />
+    <Compile Include="Analyzors\TypeAnalyzor.cs" />
     <Compile Include="Configuration\Converters\Json\JsonConfigConverter.cs" />
     <Compile Include="Configuration\Ini\IniConfigAttribute.cs" />
     <Compile Include="Configuration\Ini\IniConfigBuilder.cs" />
@@ -154,7 +159,6 @@
     <Compile Include="Extensions\MemberExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\TimerExtensions.cs" />
-    <Compile Include="InstanceAttribute.cs" />
     <Compile Include="IO\Binary\BinaryImage.cs" />
     <Compile Include="IO\Binary\BinarySerialization.cs" />
     <Compile Include="IO\Binary\BinarySerializerBase.cs" />
@@ -280,8 +284,7 @@
     <Compile Include="Translations\ITranslationEntry.cs" />
     <Compile Include="Translations\TranslationWriter.cs" />
     <Compile Include="Translations\Translator.cs" />
-    <Compile Include="TypeInstantiator.cs" />
-    <Compile Include="TypeInstantiatorMap.cs" />
+    <Compile Include="Analyzors\TypeAnalyzorResult.cs" />
     <Compile Include="Values\FlagEnumValue.cs" />
     <Compile Include="Values\Optional.cs" />
     <Compile Include="Version.cs" />

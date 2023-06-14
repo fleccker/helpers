@@ -102,7 +102,7 @@ namespace helpers.Network.Extensions.Data
                 return true;
             }
 
-            if (Reflection.HasInterface<ISerializable>(type, true))
+            if (Reflection.HasInterface<ISerializable>(type))
             {
                 m_KnownSerializables.Add(type);
                 return true;

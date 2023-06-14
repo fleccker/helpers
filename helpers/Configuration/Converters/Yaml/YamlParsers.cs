@@ -9,7 +9,6 @@ namespace helpers.Configuration.Converters.Yaml
             .WithNamingConvention(NullNamingConvention.Instance)
             .DisableAliases()
             .ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitEmptyCollections | DefaultValuesHandling.OmitEmptyCollections | DefaultValuesHandling.OmitDefaults)
-            .EnablePrivateConstructors()
             .IncludeNonPublicProperties()
             .IgnoreFields()
             .JsonCompatible()
@@ -19,10 +18,7 @@ namespace helpers.Configuration.Converters.Yaml
             .WithNamingConvention(NullNamingConvention.Instance)
             .IgnoreUnmatchedProperties()
             .IgnoreFields()
-            .EnablePrivateConstructors()
             .IncludeNonPublicProperties()
-            .WithAttemptingUnquotedStringTypeDeserialization()
-            .WithDuplicateKeyChecking()
             .Build();
     }
 }

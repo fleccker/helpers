@@ -9,6 +9,8 @@ using helpers.Extensions;
 
 using FastGenericNew;
 
+using helpers.Analyzors;
+
 namespace helpers
 {
     [LogSource("Reflection")]
@@ -57,11 +59,16 @@ namespace helpers
             {
                 if (x is null)
                 {
-                    if (allowNull) toProxy?.Invoke(default);
-                    else return;
+                    if (allowNull) 
+                        toProxy?.Invoke(default);
+                    else 
+                        return;
+
+                    return;
                 }
 
-                if (!(x is TProxy t)) return;
+                if (!(x is TProxy t)) 
+                    return;
 
                 toProxy?.Invoke(t);
             };
@@ -73,11 +80,17 @@ namespace helpers
             {
                 if (x is null)
                 {
-                    if (allowNull) toProxy?.Invoke(default);
-                    else return;
+                    if (allowNull)
+                    {
+                        toProxy?.Invoke(default);
+                        return;
+                    }
+                    else
+                        return;
                 }
 
-                if (!(x is T t)) return;
+                if (!(x is T t)) 
+                    return;
 
                 toProxy?.Invoke(t);
             };
@@ -88,8 +101,11 @@ namespace helpers
             return () =>
             {
                 var value = toProxy.Invoke();
-                if (value is null) return null;
-                else return value;
+
+                if (value is null) 
+                    return null;
+                else 
+                    return value;
             };
         }
 
@@ -97,7 +113,10 @@ namespace helpers
         {
             var list = new List<Type>();
             method = method.GetGenericMethodDefinition();
-            foreach (var arg in method.GetGenericArguments()) list.AddRange(arg.GetGenericParameterConstraints());
+
+            foreach (var arg in method.GetGenericArguments()) 
+                list.AddRange(arg.GetGenericParameterConstraints());
+
             return list.ToArray();
         }
 
@@ -124,7 +143,9 @@ namespace helpers
             try
             {
                 var field = Field(type, fieldName);
-                if (field is null) return false;
+
+                if (field is null) 
+                    return false;
 
                 field.SetValue(value, handle);
                 return true;
@@ -144,10 +165,14 @@ namespace helpers
             try
             {
                 var field = Field(type, fieldName);
-                if (field is null) return false;
+
+                if (field is null) 
+                    return false;
 
                 var value = field.GetValue(fieldHandle);
-                if (!(value is TFieldValue valueCast)) return false;
+
+                if (!(value is TFieldValue valueCast)) 
+                    return false;
 
                 fieldValue = valueCast;
                 return true;
@@ -163,7 +188,9 @@ namespace helpers
         public static bool TrySetProperty(this Type type, string propertyName, object value, object handle = null)
         {
             var property = Property(type, propertyName);
-            if (property is null) return false;
+
+            if (property is null) 
+                return false;
 
             try
             {
@@ -185,10 +212,14 @@ namespace helpers
             try
             {
                 var property = Property(type, propertyName);
-                if (property is null) return false;
+
+                if (property is null) 
+                    return false;
 
                 var value = property.GetValue(propertyHandle);
-                if (!(value is TPropertyValue valueCast)) return false;
+
+                if (!(value is TPropertyValue valueCast)) 
+                    return false;
 
                 propertyValue = valueCast;
                 return true;
@@ -263,7 +294,10 @@ namespace helpers
         public static void RemoveHandler(this Type type, string eventName, Delegate handler, object handle = null)
         {
             var eventInfo = type.GetEvent(eventName);
-            if (eventInfo is null) throw new ArgumentException($"{type.FullName} does not contain event {eventName}");
+
+            if (eventInfo is null) 
+                throw new ArgumentException($"{type.FullName} does not contain event {eventName}");
+
             eventInfo.RemoveEventHandler(handle, handler);
         }
 
@@ -300,7 +334,7 @@ namespace helpers
         {
             try
             {
-                RemoveHandler<TEventDeclaring, TEventListener>(eventName, listener, handle);
+                RemoveHandler(eventName, listener, handle);
                 return true;
             }
             catch
@@ -314,8 +348,11 @@ namespace helpers
             var handlerType = typeof(T);
             var eventInfo = type.GetEvent(eventName);
             
-            if (eventInfo is null) throw new ArgumentException($"{type.FullName} does not contain event {eventName}");
-            if (handlerType != eventInfo.EventHandlerType) throw new ArgumentException($"Type {handlerType.FullName} does not match event type {eventInfo.EventHandlerType.FullName}");
+            if (eventInfo is null) 
+                throw new ArgumentException($"{type.FullName} does not contain event {eventName}");
+            
+            if (handlerType != eventInfo.EventHandlerType) 
+                throw new ArgumentException($"Type {handlerType.FullName} does not match event type {eventInfo.EventHandlerType.FullName}");
 
             eventInfo.AddEventHandler(handle, action);
         }
@@ -324,6 +361,7 @@ namespace helpers
         {
             var eventInfo = eventDeclaringType.GetEvent(eventName);
             var delegateObj = methodHandle != null ? Delegate.CreateDelegate(eventInfo.EventHandlerType, methodHandle, methodName) : Delegate.CreateDelegate(eventInfo.EventHandlerType, methodDeclaringType.GetMethod(methodName));
+            
             eventInfo.AddEventHandler(eventHandle, delegateObj);
         }
 
@@ -331,6 +369,7 @@ namespace helpers
         {
             var eventInfo = eventDeclaringType.GetEvent(eventName);
             var delegateObj = methodHandle != null ? Delegate.CreateDelegate(eventInfo.EventHandlerType, methodHandle, method.Name) : Delegate.CreateDelegate(eventInfo.EventHandlerType, method);
+            
             eventInfo.AddEventHandler(eventHandle, delegateObj);
         }
 
@@ -391,8 +430,11 @@ namespace helpers
             var callingAssembly = System.Reflection.Assembly.GetCallingAssembly();
             var executingAssembly = System.Reflection.Assembly.GetExecutingAssembly();
 
-            if (!set.Contains(callingAssembly)) set.Add(callingAssembly);
-            if (!set.Contains(executingAssembly)) set.Add(executingAssembly);
+            if (!set.Contains(callingAssembly)) 
+                set.Add(callingAssembly);
+
+            if (!set.Contains(executingAssembly)) 
+                set.Add(executingAssembly);
 
             return set;
         }
@@ -400,59 +442,16 @@ namespace helpers
         public static T InstantiateWithGeneric<T>(Type genericType) => As<T>(Instantiate(typeof(T).MakeGenericType(genericType)));
         public static T InstantiateWithGeneric<T>(Type type, Type genericType) => As<T>(Instantiate(type.MakeGenericType(genericType)));
         public static T Instantiate<T>() => FastNew.CreateInstance<T>();
-        public static T InstantiateAs<T>(Type type, params object[] args)
-        {
-            var typeMap = args.Select(x => x.GetType()).ToArray();
-            var constructors = type.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic);
-
-            ConstructorInfo selectedConstructor = null;
-            foreach (var constructor in constructors)
-            {
-                var parameters = constructor.GetParameters();
-                var parameterTypes = parameters.Select(x => x.ParameterType);
-
-                if (parameters.Length != typeMap.Length) continue;
-                if (!parameterTypes.Match(typeMap)) continue;
-
-                selectedConstructor = constructor;
-                break;
-            }
-
-            if (selectedConstructor is null) return default;
-
-            var instance = selectedConstructor.Invoke(args);
-            return As<T>(instance);
-        }
-
-        public static T InstantiateAs<T>(params object[] args)
-        {
-            var type = typeof(T);
-            var typeMap = args.Select(x => x.GetType()).ToArray();
-            var constructors = type.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic);
-
-            ConstructorInfo selectedConstructor = null;
-            foreach (var constructor in constructors)
-            {
-                var parameters = constructor.GetParameters();
-                var parameterTypes = parameters.Select(x => x.ParameterType);
-
-                if (parameters.Length != typeMap.Length) continue;
-                if (!parameterTypes.Match(typeMap)) continue;
-
-                selectedConstructor = constructor;
-                break;
-            }
-
-            if (selectedConstructor is null) return default;
-
-            var instance = selectedConstructor.Invoke(args);
-            return SafeAs<T>(instance);
-        }
+        public static T InstantiateAs<T>(Type type, params object[] args) => TypeAnalyzor.Analyze(type).GetInstance(args, false).As<T>();
+        public static T InstantiateAs<T>(params object[] args) => TypeAnalyzor.Analyze(typeof(T)).GetInstance(args, false).As<T>();
 
         public static void Execute(Type type, string methodName, object handle = null, params object[] parameters)
         {
             var method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic);
-            if (method is null) throw new MissingMethodException(methodName);
+
+            if (method is null) 
+                throw new MissingMethodException(methodName);
+
             method.Invoke(handle, parameters);
         }
 
@@ -460,11 +459,17 @@ namespace helpers
         public static T ExecuteReturn<T>(Type type, string methodName, object handle = null, params object[] parameters)
         {
             var method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic);
-            if (method is null) throw new MissingMethodException(methodName);
+
+            if (method is null) 
+                throw new MissingMethodException(methodName);
 
             var res = method.Invoke(handle, parameters);
-            if (res is null) return default;
-            if (!(res is T t)) return default;
+
+            if (res is null) 
+                return default;
+
+            if (!(res is T t)) 
+                return default;
 
             return t;
         }
@@ -472,11 +477,13 @@ namespace helpers
         public static TValue ExecuteReturn<TType, TValue>(string methodName, TType handle = default, params object[] parameters) => ExecuteReturn<TValue>(typeof(TType), methodName, handle, parameters);
 
         public static T Instantiate<T>(Type type) => SafeAs<T>(Instantiate(type));
-        public static object Instantiate(Type type) => Activator.CreateInstance(type);
+        public static object Instantiate(Type type) => TypeAnalyzor.Analyze(type).GetInstance(null, false);
 
         public static T SafeAs<T>(this object obj)
         {
-            if (!Is<T>(obj, out var value))  return default;
+            if (!Is<T>(obj, out var value))  
+                return default;
+
             return value;
         }
         public static T As<T>(this object obj) => (T)obj;
@@ -514,60 +521,20 @@ namespace helpers
 
         public static T GetAttribute<T>(MemberInfo member)
         {
-            if (!TryGetAttribute<T>(member, out var attribute)) return default;
+            if (!TryGetAttribute<T>(member, out var attribute)) 
+                return default;
+
             return attribute;
         }
 
-        public static bool HasInterface<T>(Type type, bool checkBaseForInterfaces = false) => HasInterface(typeof(T), type, checkBaseForInterfaces);
-        public static bool HasInterface(Type interfaceType, Type type, bool checkBaseForInterfaces = false)
-        {
-            var interfaces = type.GetInterfaces();
-            if (interfaces.Length > 0)
-            {
-                for (int i = 0; i < interfaces.Length; i++)
-                {
-                    if (interfaces[i] == interfaceType) return true;
-                    if (checkBaseForInterfaces)
-                    {
-                        var baseInterfaces = interfaces[i].GetInterfaces();
-                        while (baseInterfaces != null && baseInterfaces.Length > 0)
-                        {
-                            for (int x = 0; x < baseInterfaces.Length; x++)
-                            {
-                                if (baseInterfaces[x] == interfaceType) return true;
-                                else baseInterfaces = baseInterfaces[x].GetInterfaces();
-                            }
-                        }
-                    }
-                }
-            }
-            else if (type.BaseType != null && checkBaseForInterfaces) return HasInterface(interfaceType, type.BaseType, checkBaseForInterfaces);
-            return false;
-        }
+        public static bool HasInterface<T>(Type type) => TypeAnalyzor.Analyze(type).ImplementsInterface<T>();
+        public static bool HasInterface(Type interfaceType, Type type) => TypeAnalyzor.Analyze(type).ImplementsInterface(interfaceType);
 
-        public static bool HasType<T>(Type searchType, bool checkBaseForInterfaces = false) => HasType(typeof(T), searchType, checkBaseForInterfaces);
-        public static bool HasType(Type type, Type searchType, bool checkBaseForInterfaces = false)
-        {
-            if (type.BaseType != null)
-            {
-                if (type.BaseType == searchType) return true;
-                if (checkBaseForInterfaces)
-                {
-                    var baseType = type.BaseType;
-
-                    while (baseType != null)
-                    {
-                        if (baseType == searchType) return true;
-                        else baseType = baseType.BaseType;
-                    }
-                }
-            }
-
-            return false;
-        }
+        public static bool HasType<T>(Type searchType) => TypeAnalyzor.Analyze(searchType).ImplementsType<T>();
+        public static bool HasType(Type type, Type searchType) => TypeAnalyzor.Analyze(searchType).ImplementsType(type);
 
         public static bool IsPrimitive(this Type type) => PrimitiveTypes.Contains(type);
-        public static bool IsEnumerable(this Type type) => HasInterface(type, typeof(IEnumerable), true);
-        public static bool IsDictionary(this Type type) => HasInterface(type, typeof(IDictionary), true);
+        public static bool IsEnumerable(this Type type) => HasInterface(type, typeof(IEnumerable));
+        public static bool IsDictionary(this Type type) => HasInterface(type, typeof(IDictionary));
     }
 }
