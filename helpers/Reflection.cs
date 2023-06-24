@@ -158,6 +158,7 @@ namespace helpers
 
         public static TFieldValue GetField<TFieldValue>(this Type type, string fieldName, object fieldHandle = null) => TryGetField<TFieldValue>(type, fieldName, fieldHandle, out var value) ? value : default;
         public static TFieldValue GetField<TFieldValue, TDeclaringType>(string fieldName, TDeclaringType fieldHandle = default) => TryGetField<TFieldValue>(typeof(TDeclaringType), fieldName, fieldHandle, out var value) ? value : default;
+        
         public static bool TryGetField<TFieldValue>(this Type type, string fieldName, object fieldHandle, out TFieldValue fieldValue)
         {
             fieldValue = default;
@@ -205,6 +206,7 @@ namespace helpers
 
         public static TPropertyValue GetProperty<TPropertyValue>(this Type type, string propertyName, object propertyHandle = null) => TryGetProperty<TPropertyValue>(type, propertyName, propertyHandle, out var value) ? value : default;
         public static TPropertyValue GetProperty<TPropertyValue, TDeclaringType>(string propertyName, TDeclaringType propertyHandle = default) => TryGetProperty<TPropertyValue>(typeof(TDeclaringType), propertyName, propertyHandle, out var value) ? value : default;
+        
         public static bool TryGetProperty<TPropertyValue>(this Type type, string propertyName, object propertyHandle, out TPropertyValue propertyValue)
         {
             propertyValue = default;
@@ -455,7 +457,106 @@ namespace helpers
             method.Invoke(handle, parameters);
         }
 
+        public static void Execute(Type type, string methodName, object handle, out object outValue, params object[] parameters)
+        {
+            var method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic);
+
+            if (method is null)
+                throw new MissingMethodException(methodName);
+
+            var paramList = new List<object>();
+            var methodParams = method.GetParameters();
+
+            var outAdded = false;
+            var outIndex = methodParams.FindIndex(param => param.IsOut);
+
+            if (outIndex < 0)
+            {
+                for (int i = 0; i < parameters.Length; i++)
+                {
+                    if (i == outIndex)
+                    {
+                        paramList.Add(null);
+                        outAdded = true;
+                    }
+                    else
+                    {
+                        paramList.Add(parameters[i]);
+                    }
+                }
+            }
+
+            if (!outAdded)
+            {
+                paramList.Add(null);
+                outAdded = true;
+            }
+
+            method.Invoke(handle, parameters);
+
+            outValue = parameters[outIndex];
+        }
+
+        public static object ExecuteReturn(Type type, string methodName, object handle, out object outValue, params object[] parameters)
+        {
+            var method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic);
+
+            if (method is null)
+                throw new MissingMethodException(methodName);
+
+            var paramList = new List<object>();
+            var methodParams = method.GetParameters();
+
+            var outAdded = false;
+            var outIndex = methodParams.FindIndex(param => param.IsOut);
+
+            if (outIndex < 0)
+            {
+                for (int i = 0; i < parameters.Length; i++)
+                {
+                    if (i == outIndex)
+                    {
+                        paramList.Add(null);
+                        outAdded = true;
+                    }
+                    else
+                    {
+                        paramList.Add(parameters[i]);
+                    }
+                }
+            }
+
+            if (!outAdded)
+            {
+                paramList.Add(null);
+                outAdded = true;
+            }
+
+            var result = method.Invoke(handle, parameters);
+            outValue = parameters[outIndex];
+            return result;
+        }
+
         public static void Execute<T>(string methodName, T handle = default, params object[] parameters) => Execute(typeof(T), methodName, handle, parameters);
+        public static void Execute<T, TOut>(string methodName, T handle, out TOut outValue, params object[] parameters)
+        {
+            Execute(typeof(T), methodName, handle, out var result, parameters);
+
+            if (result is null)
+            {
+                outValue = default;
+                return;
+            }
+
+            if (!(result is TOut outV))
+            {
+                outValue = default;
+                return;
+            }
+
+            outValue = outV;
+        }
+
         public static T ExecuteReturn<T>(Type type, string methodName, object handle = null, params object[] parameters)
         {
             var method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic);

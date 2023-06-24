@@ -61,7 +61,7 @@ namespace helpers.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 3.2.0-A.
+        ///   Looks up a localized string similar to 3.3.0-A.
         /// </summary>
         internal static string LibraryVersion {
             get {

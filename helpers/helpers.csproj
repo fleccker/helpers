@@ -151,8 +151,9 @@
     <Compile Include="Configuration\Register\RegisterConfigWriter.cs" />
     <Compile Include="ConsoleUtils.cs" />
     <Compile Include="Encryption\Encryptor.cs" />
-    <Compile Include="Events\EventManager.cs" />
     <Compile Include="Events\EventProvider.cs" />
+    <Compile Include="Events\EventManager.cs" />
+    <Compile Include="Events\EventResult.cs" />
     <Compile Include="ExceptionManager.cs" />
     <Compile Include="Extensions\CollectionExtensions.cs" />
     <Compile Include="Extensions\EnumExtensions.cs" />
@@ -168,6 +169,11 @@
     <Compile Include="IO\Binary\Serializers\UnknownTypeSerializer.cs" />
     <Compile Include="IO\DirectoryManager.cs" />
     <Compile Include="IO\FileManager.cs" />
+    <Compile Include="IO\Storage\IStorage.cs" />
+    <Compile Include="IO\Storage\Multiple\MultipleFileStorage.cs" />
+    <Compile Include="IO\Storage\Multiple\MultipleFileStorageData.cs" />
+    <Compile Include="IO\Storage\Single\SingleFileStorage.cs" />
+    <Compile Include="IO\Storage\StorageMode.cs" />
     <Compile Include="Json\JsonHelper.cs" />
     <Compile Include="Json\JsonOptionsBuilder.cs" />
     <Compile Include="Logging\LogBuilder.cs" />
@@ -285,6 +291,7 @@
     <Compile Include="Translations\TranslationWriter.cs" />
     <Compile Include="Translations\Translator.cs" />
     <Compile Include="Analyzors\TypeAnalyzorResult.cs" />
+    <Compile Include="Values\ActiveValue.cs" />
     <Compile Include="Values\FlagEnumValue.cs" />
     <Compile Include="Values\Optional.cs" />
     <Compile Include="Version.cs" />

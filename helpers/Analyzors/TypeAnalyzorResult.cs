@@ -10,7 +10,7 @@ namespace helpers.Analyzors
 {
     public class TypeAnalyzorResult
     {
-        private static readonly List<ITypeInstantiator> m_GlobalInstantiators = new List<ITypeInstantiator>();
+        private static readonly List<ITypeInstantiator> m_GlobalInstantiators = new List<ITypeInstantiator>() { new ConstructorTypeInstantiator() };
 
         public static IReadOnlyList<ITypeInstantiator> GlobalInstantiators => m_GlobalInstantiators;
 

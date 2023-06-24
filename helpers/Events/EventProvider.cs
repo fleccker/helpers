@@ -1,88 +1,170 @@
 ﻿using helpers.Extensions;
 using helpers.Random;
-
+using helpers.Results;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace helpers.Events
 {
-    [LogSource("Event Provider")]
     public class EventProvider
     {
-        public string Id { get; }
-        
-        public EventProvider() 
-        { 
-            Id = RandomGeneration.Default.GetString(5);
-            EventManager.Add(this);
-        }
+        private readonly List<Delegate> m_Handlers = new List<Delegate>();
+        private readonly string m_Id;
 
-        public EventProvider(string id)
+        private int m_Times = 0;
+        private bool m_Allowed;
+
+        public IReadOnlyList<Delegate> Handlers => m_Handlers;
+
+        public int TimesExecuted => m_Times;
+
+        public string Id => m_Id;
+
+        public bool IsAllowed { get => m_Allowed; set => m_Allowed = value; }
+
+        public EventProvider(string id = null)
         {
-            Id = id;
-            EventManager.Add(this);
+            m_Allowed = true;
+
+            if (id is null)
+            {
+                m_Id = RandomGeneration.Default.GetReadableString(20);
+            }
+            else
+            {
+                m_Id = id;
+            }
         }
-        
-        private List<Action<ObjectCollection>> _handlers = new List<Action<ObjectCollection>>();
-        private List<Action> _parameterLessHandlers = new List<Action>();
 
         public void Invoke(params object[] args)
         {
-            if (args is null || !args.Any())
-            {
-                Invoke((ObjectCollection)null);
+            if (!m_Allowed)
                 return;
-            }
 
-            var collection = new ObjectCollection();
-
-            foreach (var arg in args)
+            m_Times++;
+            m_Handlers.ForEach(target =>
             {
-                if (arg is KeyValuePair<string, object> valuePair) collection.Add(valuePair.Value, valuePair.Key);
-                else if (arg is Tuple<string, object> tuple) collection.Add(tuple.Item2, tuple.Item1);
-                else collection.Add(arg);
+                try
+                {
+                    if (!ValidateArgs(args, target.Method.GetParameters(), out var newArgs))
+                        return;
+
+                    target.Method.Invoke(target.Target, newArgs);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"Event Handler ({Id})", $"Failed to execute target: {target.Method.Name} ({target.Method.DeclaringType.FullName})\n{ex}");
+                }
+            });
+        }
+
+        public EventResult<TResult> Invoke<TResult>(TResult defResult, params object[] args)
+        {
+            if (!m_Allowed)
+                return null;
+
+            m_Times++;
+
+            var result = new EventResult<TResult>() { Result = defResult };
+
+            m_Handlers.ForEach(target =>
+            {
+                try
+                {
+                    if (!ValidateArgs(args, target.Method.GetParameters(), result, out var newArgs))
+                        return;
+
+                    target.Method.Invoke(target.Target, newArgs);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"Event Handler ({Id})", $"Failed to execute target: {target.Method.Name} ({target.Method.DeclaringType.FullName})\n{ex}");
+                }
+            });
+
+            return result;
+        }
+
+        public void Register(Delegate target)
+        {
+            m_Handlers.Add(target);
+        }
+
+        public void Unregister(Delegate target)
+        {
+            m_Handlers.Remove(target);
+        }
+
+        public void UnregisterAll()
+        {
+            m_Handlers.Clear();
+        }
+
+        private bool ValidateArgs(object[] args, ParameterInfo[] parameters, out object[] newArgs)
+        {
+            if (parameters is null || !parameters.Any())
+            {
+                newArgs = null;
+                return true;
             }
 
-            Invoke(collection);
+            newArgs = new object[parameters.Length];
+
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                if (!(i >= args.Length))
+                {
+                    newArgs[i] = args[i];
+                    continue;
+                }
+                else
+                {
+                    newArgs[i] = null;
+                    continue;
+                }
+            }
+
+            return true;
         }
 
-        public void Invoke(ObjectCollection eventArgsCollection)
+        private bool ValidateArgs<TResult>(object[] args, ParameterInfo[] parameters, EventResult<TResult> result, out object[] newArgs)
         {
-            if (eventArgsCollection != null) _handlers.ForEach(y => y.Invoke(eventArgsCollection));
-            _parameterLessHandlers.ForEach(x => x.Invoke());
-        }
+            if (parameters is null || !parameters.Any())
+            {
+                newArgs = null;
+                return true;
+            }    
 
-        public void Add(Action<ObjectCollection> handler)
-        {
-            if (Has(handler)) return;
-            _handlers.Add(handler);
-        }
+            if (parameters.Length is 1 && parameters[0].ParameterType == typeof(EventResult<TResult>))
+            {
+                newArgs = new object[] { result };
+                return true;
+            }
 
-        public void Add(Action handler)
-        {
-            if (Has(handler)) return;
-            _parameterLessHandlers.Add(handler);
-        }
+            newArgs = new object[parameters.Length];
 
-        public void Remove(Action<ObjectCollection> handler)
-        {
-            if (!Has(handler)) return;
-            _handlers.Remove(handler);
-        }
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                if (parameters[i].ParameterType == typeof(EventResult<TResult>))
+                {
+                    newArgs[i] = result;
+                    continue;
+                }
 
-        public void Remove(Action handler)
-        {
-            if (!Has(handler)) return;
-            _parameterLessHandlers.Remove(handler);
-        }
+                if (!(i >= args.Length))
+                {
+                    newArgs[i] = args[i];
+                    continue;
+                }
+                else
+                {
+                    newArgs[i] = null;
+                    continue;
+                }
+            }
 
-        public bool Has(Action<ObjectCollection> handler) => _handlers.Contains(handler);
-        public bool Has(Action action) => _parameterLessHandlers.Contains(action);
-
-        public void Clear()
-        {
-            _handlers.Clear();
-            _parameterLessHandlers.Clear();
+            return true;
         }
     }
 }
