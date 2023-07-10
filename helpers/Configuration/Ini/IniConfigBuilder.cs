@@ -3,29 +3,44 @@ using helpers.Extensions;
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 
 namespace helpers.Configuration.Ini
 {
     [LogSource("Ini Builder")]
-    public class IniConfigBuilder
+    public class IniConfigBuilder : DisposableBase
     {
         private IniConfigHandler _handler;
-        private Dictionary<Type, object> _preRegistered = new Dictionary<Type, object>();
         private IConfigConverter _converter;
-        private string _globalPath;
-        private Dictionary<string, string> _customPaths = new Dictionary<string, string>();
+        private ConfigNamingRule _rule = ConfigNamingRule.SetValue;
+        private string _path;
+        private bool _useWatcher;
+        private Dictionary<Type, object> _preRegistered = new Dictionary<Type, object>();
 
-        public IniConfigBuilder WithType<T>(T instance = default)
+        public IniConfigBuilder WithGeneric<T>(T instance = default)
         {
             _preRegistered[typeof(T)] = instance;
             return this;
         }
 
-        public IniConfigBuilder WithType(Type type, object instance = null)
+        public IniConfigBuilder WithWatcher()
         {
-            _preRegistered[type] = instance;
+            _useWatcher = true;
             return this;
         }
+
+        public IniConfigBuilder WithNamingRule(ConfigNamingRule configNamingRule)
+        {
+            _rule = configNamingRule;
+            return this;
+        }
+
+        public IniConfigBuilder WithAssembly(Assembly assembly)
+            => WithTypes(assembly.GetTypes());
+
+        public IniConfigBuilder WithAssembly()
+            => WithAssembly(Assembly.GetCallingAssembly());
 
         public IniConfigBuilder WithTypes(params Type[] types)
         {
@@ -45,55 +60,42 @@ namespace helpers.Configuration.Ini
             return this;
         }
 
-        public IniConfigBuilder WithGlobalPath(string globalPath)
+        public IniConfigBuilder WithPath(string path)
         {
-            _globalPath = globalPath;
-            return this;
-        }
-
-        public IniConfigBuilder WithAlias(string aliasName, string aliasPath)
-        {
-            _customPaths[aliasName] = aliasPath;
+            _path = Path.GetFullPath(path);
             return this;
         }
 
         public IniConfigHandler Build()
         {
-            _handler = new IniConfigHandler();
-            _handler._converter = _converter;
+            CheckDisposed();
 
-            if (!string.IsNullOrWhiteSpace(_globalPath))
-                _handler._paths["global"] = _globalPath;
+            _handler ??= new IniConfigHandler();
+            _handler.Converter = _converter;
+            _handler.Path = _path;
+            _handler.ShouldUseWatcher = _useWatcher;
+            _handler.NamingRule = _rule;
+
+            foreach (var register in _preRegistered)
+                _handler.Register(register.Key, register.Value);
 
             return _handler;
         }
 
-        public IniConfigBuilder Register(ref IniConfigHandler handler)
+        public IniConfigBuilder Build(ref IniConfigHandler handler)
         {
-            if (_handler is null)
-            {
-                _handler = Build();
+            handler = Build();
+            return this;
+        }
 
-                handler = _handler;
-            }
-
-            foreach (var pair in _preRegistered)
-            {
-                _handler.Register(pair.Key, pair.Value);
-            }
-            foreach (var path in _customPaths)
-            {
-                _handler._paths[path.Key] = path.Value;
-            }
-
+        public override void Dispose()
+        {
             _preRegistered.Clear();
             _preRegistered = null;
-            _customPaths.Clear();
-            _customPaths = null;
-            _converter = null;
-            _globalPath = null;
+            _path = null;
+            _useWatcher = false;
 
-            return this;
+            base.Dispose();
         }
     }
 }

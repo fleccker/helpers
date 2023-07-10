@@ -15,6 +15,7 @@ namespace helpers.Pooling.Pools
 
         private void PrepareGet(DataPack dataPack) => dataPack?.Clear();
         private void PrepareStore(DataPack dataPack) => dataPack.Clear();
+        
         private DataPack Constructor() => new DataPack();
     }
 }

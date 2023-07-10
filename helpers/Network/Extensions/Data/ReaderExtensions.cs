@@ -86,6 +86,7 @@ namespace helpers.Network.Extensions.Data
                 var jsonBytes = reader.ReadBytes(jsonBytesLength);
                 var json = Encoding.ASCII.GetString(jsonBytes);
                 var instance = JsonHelper.FromJson(json, type);
+
                 return instance;
             }
         }

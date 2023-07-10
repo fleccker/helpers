@@ -11,7 +11,6 @@ namespace helpers.Configuration.Converters.Yaml
             .ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitEmptyCollections | DefaultValuesHandling.OmitEmptyCollections | DefaultValuesHandling.OmitDefaults)
             .IncludeNonPublicProperties()
             .IgnoreFields()
-            .JsonCompatible()
             .Build();
 
         public static IDeserializer Deserializer { get; } = new DeserializerBuilder()

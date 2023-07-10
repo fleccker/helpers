@@ -264,13 +264,25 @@ namespace helpers.Extensions
                 var item = source.ElementAt(i);
                 var targetItem = target.ElementAt(i);
 
-                if (item is object itemObj && targetItem is object targetObj)
+                if (item is null)
                 {
-                    if (itemObj is null && targetObj is null) continue;
+                    if (targetItem is not null)
+                        return false;
+                    else
+                        continue;
+                }
+                else if (targetItem is null)
+                {
+                    if (item is not null)
+                        return false;
+                    else
+                        continue;
                 }
 
-                if (item.Equals(targetItem)) continue;
-                else return false;
+                if (item.Equals(targetItem)) 
+                    continue;
+                else 
+                    return false;
             }
 
             return true;

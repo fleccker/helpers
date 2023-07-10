@@ -17,6 +17,7 @@ using System.IO;
 using System;
 
 using WatsonTcp;
+using helpers.Network.Requests;
 
 namespace helpers.Network.Controllers.Server
 {
@@ -39,6 +40,8 @@ namespace helpers.Network.Controllers.Server
             m_Features = new NetworkFeatureManager(this);
             m_Auth = useAuth ? m_Features.AddFeature<KeyAuthentification>() : null;
             m_DataManager = m_Features.AddFeature<DataManager>();
+            m_Callbacks = m_Features.AddFeature<NetworkCallbackManager>();
+            m_Features.AddFeature<RequestManager>();
         }
 
         public IReadOnlyList<INetworkPeer> Peers => m_Peers;

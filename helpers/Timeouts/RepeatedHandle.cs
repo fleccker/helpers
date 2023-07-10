@@ -6,7 +6,7 @@ namespace helpers.Timeouts
     public struct RepeatedHandle
     {
         private volatile Action _delegate;
-        private Timeout _timeout;
+        private Ratelimit _timeout;
         private Thread _thread;
         private CancellationTokenSource _tokenSource;
         private CancellationToken _token;
@@ -27,7 +27,7 @@ namespace helpers.Timeouts
         public RepeatedHandle(float value, Action handle)
         {
             _delegate = handle;
-            _timeout = new Timeout(value);
+            _timeout = new Ratelimit(value);
             _thread = new Thread(Update);
             _thread.Start();
         }

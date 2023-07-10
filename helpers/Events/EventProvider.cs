@@ -1,6 +1,6 @@
 ﻿using helpers.Extensions;
 using helpers.Random;
-using helpers.Results;
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -59,7 +59,7 @@ namespace helpers.Events
             });
         }
 
-        public EventResult<TResult> Invoke<TResult>(TResult defResult, params object[] args)
+        public EventResult<TResult> InvokeResult<TResult>(TResult defResult, params object[] args)
         {
             if (!m_Allowed)
                 return null;
@@ -109,10 +109,14 @@ namespace helpers.Events
                 return true;
             }
 
+            Log.Debug($"Validating arguments: {args.Length} / {parameters.Length}");
+
             newArgs = new object[parameters.Length];
 
             for (int i = 0; i < parameters.Length; i++)
             {
+                Log.Debug($"Index {i}: {args[i]} / {parameters[i].ParameterType.FullName}");
+
                 if (!(i >= args.Length))
                 {
                     newArgs[i] = args[i];

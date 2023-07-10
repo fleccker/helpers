@@ -1,4 +1,7 @@
 ﻿using helpers.Configuration.Converters;
+using helpers.Timeouts;
+using helpers.Extensions;
+using helpers.Events;
 
 using Fasterflect;
 
@@ -13,115 +16,225 @@ namespace helpers.Configuration.Ini
     [LogSource("Ini Handler")]
     public class IniConfigHandler
     {
+        public const string IniFilter = "*.ini";
+
+        private bool _saveHistory;
+        private bool _useWatcher;
+
+        private string _path;
+
+        private ConfigNamingRule _rule = ConfigNamingRule.SetValue;
+
         private Dictionary<object, Tuple<IniConfigAttribute, object>> _registeredConfigs = new Dictionary<object, Tuple<IniConfigAttribute, object>>();
-        
-        internal Dictionary<string, string> _paths = new Dictionary<string, string>();
+        private FileSystemWatcher _watcher;
+        private IniConfigReader _reader;
+
         internal IConfigConverter _converter;
 
-        public event Action<IniConfigAttribute, object> OnRegistered;
+        public readonly EventProvider OnRegistered = new EventProvider();
+        public readonly EventProvider OnReadStarted = new EventProvider();
+        public readonly EventProvider OnReadConfig = new EventProvider();
+        public readonly EventProvider OnReadFinished = new EventProvider();
+        public readonly EventProvider OnSaved = new EventProvider();
 
-        public void Read()
+        public readonly EventProvider OnWatcherStarted = new EventProvider();
+        public readonly EventProvider OnWatcherStopped = new EventProvider();
+
+        public IReadOnlyDictionary<object, Tuple<IniConfigAttribute, object>> Registry => _registeredConfigs;
+        public IConfigConverter Converter { get => _converter; set => _converter = value; }
+
+        public ConfigNamingRule NamingRule { get => _rule; set => _rule = value; }
+
+        public string Path { get => _path; set => _path = value; }
+
+        public bool IsUsingWatcher => _watcher != null && _watcher.EnableRaisingEvents;
+
+        public bool ShouldUseWatcher
         {
-            var readers = new Dictionary<string, IniConfigReader>();
-
-            foreach (var path in _paths.Values)
+            get => _useWatcher;
+            set
             {
-                if (!File.Exists(path))
+                if (_useWatcher == value)
+                    return;
+
+                _useWatcher = value;
+
+                if (_useWatcher)
                 {
-                    Log.Debug("IniConfigHandler", $"Generating default file for: {path} (file missing)");
-
-                    Save(path);
-                    continue;
-                }
-
-                var text = File.ReadAllText(path);
-
-                if (string.IsNullOrWhiteSpace(text))
-                {
-                    Log.Debug("IniConfigHandler", $"Generating default file for: {path} (file empty)");
-
-                    Save(path);
-                    continue;
-                }
-
-                readers[path] = new IniConfigReader(File.ReadAllLines(path));
-
-                Log.Debug("IniConfigHandler", $"Assigned reader for path: {path}");
-            }
-
-            foreach (var reader in readers.Values)
-            {
-                while (reader.TryMove())
-                {
-                    if (!reader.IsLineValid)
-                        continue;
-
-                    Log.Debug($"Key: {reader.CurrentKey}");
-                    Log.Debug($"Value: {reader.CurrentValue}");
-
-                    var configType = _registeredConfigs.FirstOrDefault(x => x.Value.Item1.GetName() == reader.CurrentKey);
-
-                    if (configType.Value is null)
-                        continue;
-
-                    var objectType = (configType.Key is PropertyInfo objectPropertyInfo ? objectPropertyInfo.PropertyType : (configType.Key as FieldInfo).FieldType);
-
-                    if (_converter.TryConvert(reader.CurrentValue, objectType, out var result))
+                    if (_watcher is null)
                     {
-                        if (configType.Key is FieldInfo field)
-                            field.SetValue(configType.Value.Item2, result);
-                        else if (configType.Key is PropertyInfo property)
-                            property.SetValue(configType.Value.Item2, result);
-                        else
-                            Log.Error("IniConfigHandler", $"Unknown config target: {configType.Key}");
+                        _watcher = new FileSystemWatcher(System.IO.Path.GetDirectoryName(_path), IniFilter);
+                        _watcher.NotifyFilter = NotifyFilters.LastWrite;
+                        _watcher.Changed += OnChange;
+                        _watcher.EnableRaisingEvents = true;
+
+                        OnWatcherStarted.Invoke(_watcher);
+                    }
+                }
+                else
+                {
+                    if (_watcher != null)
+                    {
+                        _watcher.Changed -= OnChange;
+                        _watcher.EnableRaisingEvents = false;
+                        _watcher.NotifyFilter = default;
+                        _watcher.Dispose();
+                        _watcher = null;
+
+                        OnWatcherStopped.Invoke(_watcher);
                     }
                 }
             }
         }
 
-        public void Save()
+        private void FinishReading()
         {
-            var writers = new Dictionary<string, IniConfigWriter>();
+            OnReadFinished.Invoke();
+        }
 
-            foreach (var key in _registeredConfigs)
+        public void Read()
+        {
+            // watcher prevention
+
+            if (_saveHistory)
+                return;
+
+            try
             {
-                var filePath = _paths[key.Value.Item1.GetPairName()];
-                var writer = (writers.TryGetValue(filePath, out var writerValue) ? writerValue : (writers[filePath] = new IniConfigWriter(_converter)));
+                Log.Debug($"Starting reading {Path}");
 
-                writer.WriteObject(
-                    key.Value.Item1.GetName(),   
-                    key.Value.Item1.GetDescription(), 
-                    
-                    (key.Key is PropertyInfo property ? property.GetValue(key.Value.Item2) : (key.Key as FieldInfo).GetValue(key.Value.Item2)));
+                OnReadStarted.Invoke();
+
+                if (!File.Exists(Path))
+                {
+                    Save();
+                    FinishReading();
+                    return;
+                }
+
+                if (_reader != null)
+                {
+                    _reader.Dispose();
+                    _reader = null;
+                }
+
+                var text = File.ReadAllText(Path);
+
+                if (string.IsNullOrWhiteSpace(text))
+                {
+                    Save();
+                    FinishReading();
+                    return;
+                }
+
+                _reader = new IniConfigReader(File.ReadAllLines(Path));
+                _registeredConfigs.ForEach(cfg => cfg.Value.Item1.ResetSet());
+
+                while (_reader.TryMove())
+                {
+                    if (!_reader.IsLineValid)
+                        continue;
+
+                    if (!_registeredConfigs.TryGetFirst(cfg => cfg.Value != null && cfg.Value.Item1.Name == _reader.CurrentKey, out var config))
+                    {
+                        Log.Warn($"Failed to find a config with key {_reader.CurrentKey}!");
+                        continue;
+                    }
+
+                    Type objType = null;
+
+                    if (config.Key is PropertyInfo propInfo)
+                        objType = propInfo.PropertyType;
+                    else if (config.Key is FieldInfo fieldInfo)
+                        objType = fieldInfo.FieldType;
+
+                    Log.Debug($"Config object type: {objType.FullName}");
+
+                    if (objType is null)
+                    {
+                        Log.Error($"Unknown config target! ({config.Key}) ({_reader.CurrentKey})");
+                        continue;
+                    }
+
+                    if (_converter.TryConvert(_reader.CurrentValue, objType, out var configValue))
+                    {
+                        Log.Debug($"Converted value for key {_reader.CurrentKey}: {configValue?.ToString() ?? null}");
+
+                        if (config.Key is PropertyInfo prop)
+                        {
+                            prop.SetValue(config.Value.Item2, configValue);
+                            OnReadConfig.Invoke(_reader.CurrentKey, _reader.CurrentValue, configValue);
+                            config.Value.Item1.Set();
+                        }
+                        else if (config.Key is FieldInfo field)
+                        {
+                            field.SetValue(config.Value.Item2, configValue);
+                            OnReadConfig.Invoke(_reader.CurrentKey, _reader.CurrentValue, configValue);
+                            config.Value.Item1.Set();
+                        }
+                        else
+                        {
+                            Log.Error($"Unknown config target! ({config.Key}) ({_reader.CurrentKey})");
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        Log.Error($"Failed to convert key {_reader.CurrentKey} (type: {objType.FullName})! Value: {_reader.CurrentValue}");
+                        continue;
+                    }
+                }
+
+                if (_registeredConfigs.Any(cfg => !cfg.Value.Item1._lastSet))
+                {
+                    Log.Warn($"Missing config keys detected! Regenerating file ..");
+
+                    var directory = System.IO.Path.GetDirectoryName(Path);
+                    var newPath = $"{directory}/{System.IO.Path.GetFileNameWithoutExtension(Path)}-old.ini";
+
+                    File.Move(Path, newPath);
+
+                    Save();
+                }
+
+                FinishReading();
+
+                Log.Info($"Finished reading file {Path}!");
             }
-
-            foreach (var pair in writers)
+            catch (Exception ex)
             {
-                var value = pair.Value.ToString();
-
-                File.WriteAllText(pair.Key, value);
+                FinishReading();
+                Log.Error(ex);
             }
         }
 
-        private void Save(string path)
+        public void Save()
         {
+            _saveHistory = true;
 
-            var keys = _registeredConfigs.Where(x => _paths[x.Value.Item1.GetPairName()] == path);
-            if (keys.Any())
+            try
             {
                 var writer = new IniConfigWriter(_converter);
 
-                foreach (var key in keys)
+                foreach (var key in _registeredConfigs)
                 {
-                    writer.WriteObject(key.Value.Item1.GetName(), key.Value.Item1.GetDescription(), (key.Key is PropertyInfo property ? property.GetValue(key.Value.Item2) : (key.Key as FieldInfo).GetValue(key.Value.Item2)));
+                    writer.WriteObject(
+                        key.Value.Item1.Name,
+                        key.Value.Item1.Description,
+
+                        (key.Key is PropertyInfo property ? property.GetValue(key.Value.Item2) : (key.Key as FieldInfo).GetValue(key.Value.Item2)));
                 }
 
-                File.WriteAllText(path, writer.ToString());
+                File.WriteAllText(Path, writer.ToString());
             }
-            else
+            catch (Exception ex)
             {
-                Log.Warn("IniConfigHandler", $"No keys with the specified path were found.");
+                Log.Error(ex);
             }
+
+            Timeout.Delay(500, () => _saveHistory = false);
+
+            OnSaved.Invoke();
         }
 
         public void Register(Type type, object typeInstance = null)
@@ -221,11 +334,22 @@ namespace helpers.Configuration.Ini
                         continue;
                     }
 
-                    if (string.IsNullOrWhiteSpace(iniConfigAttribute.GetName()))
-                        iniConfigAttribute._name = property.Name;
+                    if (string.IsNullOrWhiteSpace(iniConfigAttribute.Name))
+                    {
+                        Log.Warn($"Config attribute property {property.DeclaringType.FullName}::{property.Name} is missing it's name!");
+
+                        if (_rule is ConfigNamingRule.ThrowException)
+                            throw new Exception($"Config attribute property {property.DeclaringType.FullName}::{property.Name} is missing it's name!");
+                        else if (_rule is ConfigNamingRule.Skip)
+                            continue;
+                        else if (_rule is ConfigNamingRule.SetValue)
+                            iniConfigAttribute.Name = property.Name;
+                        else
+                            iniConfigAttribute.Name = $"{property.DeclaringType.Name}.{property.Name}";
+                    }
 
                     _registeredConfigs[property] = new Tuple<IniConfigAttribute, object>(iniConfigAttribute, typeInstance);
-                    OnRegistered?.Invoke(iniConfigAttribute, typeInstance);
+                    OnRegistered.Invoke(iniConfigAttribute, typeInstance);
                 }
             }
         }
@@ -243,13 +367,38 @@ namespace helpers.Configuration.Ini
                     if (IsRegistered(field, typeInstance))
                         continue;
 
-                    if (string.IsNullOrWhiteSpace(iniConfigAttribute.GetName()))
-                        iniConfigAttribute._name = field.Name;
+                    if (string.IsNullOrWhiteSpace(iniConfigAttribute.Name))
+                    {
+                        Log.Warn($"Config attribute field {field.DeclaringType.FullName}::{field.Name} is missing it's name!");
+
+                        if (_rule is ConfigNamingRule.ThrowException)
+                            throw new Exception($"Config attribute field {field.DeclaringType.FullName}::{field.Name} is missing it's name!");
+                        else if (_rule is ConfigNamingRule.Skip)
+                            continue;
+                        else if (_rule is ConfigNamingRule.SetValue)
+                            iniConfigAttribute.Name = field.Name;
+                        else
+                            iniConfigAttribute.Name = $"{field.DeclaringType.Name}.{field.Name}";
+                    }
 
                     _registeredConfigs[field] = new Tuple<IniConfigAttribute, object>(iniConfigAttribute, typeInstance);
-                    OnRegistered?.Invoke(iniConfigAttribute, typeInstance);
+                    OnRegistered.Invoke(iniConfigAttribute, typeInstance);
                 }
             }
+        }
+
+        private void OnChange(object sender, FileSystemEventArgs ev)
+        {
+            if (ev.ChangeType != WatcherChangeTypes.Changed)
+                return;
+
+            if (ev.FullPath != Path)
+                return;
+
+            Timeout.Delay(300, () =>
+            {
+                Read();
+            });
         }
     }
 }

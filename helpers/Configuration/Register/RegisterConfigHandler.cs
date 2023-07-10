@@ -75,14 +75,16 @@ namespace helpers.Configuration.Register
                 OnUnbind.Invoke(config);
                 return true;
             }
-            else return false;
+            else 
+                return false;
         }
 
         public void ChangePath(string newFile)
         {
             ThrowIfPathInvalid(newFile);
+            var oldPath = new string(_file.ToArray());
             _file = newFile;
-            OnPathChanged.Invoke(newFile, _file);
+            OnPathChanged.Invoke(newFile, oldPath);
         }
  
         public void Reload()

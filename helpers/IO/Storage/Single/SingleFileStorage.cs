@@ -1,7 +1,8 @@
 ﻿using helpers.Configuration.Converters.Yaml;
+using helpers.Extensions;
 using helpers.IO.Binary;
 using helpers.Json;
-
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -28,6 +29,14 @@ namespace helpers.IO.Storage
             m_TargetPath = targetPath;
             m_Mode = mode;
         }
+
+        public bool Add(TData data) => m_Data.Add(data);
+        public bool Remove(TData data) => m_Data.Remove(data);
+        public bool Contains(TData data) => m_Data.Contains(data);
+
+        public void ForEach(Action<TData> action) => m_Data.ForEach(action);
+
+        public bool TryGet(Func<TData, bool> predicate, out TData data) => m_Data.TryGetFirst(predicate, out data);
 
         public void Reload()
         {

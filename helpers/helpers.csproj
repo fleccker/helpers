@@ -135,6 +135,7 @@
     <Compile Include="Analyzors\Instantiation\TypeInstanceAttribute.cs" />
     <Compile Include="Analyzors\Instantiation\TypeInstanceProperty.cs" />
     <Compile Include="Analyzors\TypeAnalyzor.cs" />
+    <Compile Include="Configuration\ConfigNamingRule.cs" />
     <Compile Include="Configuration\Converters\Json\JsonConfigConverter.cs" />
     <Compile Include="Configuration\Ini\IniConfigAttribute.cs" />
     <Compile Include="Configuration\Ini\IniConfigBuilder.cs" />
@@ -255,6 +256,12 @@
     <Compile Include="Parsers\String\StringParser.cs" />
     <Compile Include="Parsers\String\StringParserPart.cs" />
     <Compile Include="Parsers\String\StringParserUtils.cs" />
+    <Compile Include="Patching\PatchAttribute.cs" />
+    <Compile Include="Patching\PatchMethodType.cs" />
+    <Compile Include="Patching\PatchTarget.cs" />
+    <Compile Include="Patching\PatchInfo.cs" />
+    <Compile Include="Patching\PatchManager.cs" />
+    <Compile Include="Patching\PatchType.cs" />
     <Compile Include="Pooling\Exceptions\PoolEmptyException.cs" />
     <Compile Include="Pooling\Pool.cs" />
     <Compile Include="CurrentSystem.cs" />
@@ -281,6 +288,9 @@
     <Compile Include="Services\IServiceCollection.cs" />
     <Compile Include="Singleton.cs" />
     <Compile Include="Timeouts\RepeatedHandle.cs" />
+    <Compile Include="Timeouts\Ratelimit.cs" />
+    <Compile Include="Timeouts\ResultTimeout.cs" />
+    <Compile Include="Timeouts\ResultTimeoutStatus.cs" />
     <Compile Include="Timeouts\Timeout.cs" />
     <Compile Include="Translations\Entries\StringEntry.cs" />
     <Compile Include="Translations\Exceptions\TranslationEntryNotFoundException.cs" />

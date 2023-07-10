@@ -1,42 +1,36 @@
-﻿using System;
-using System.Linq;
+﻿using helpers.Extensions;
+
+using System;
 
 namespace helpers.Configuration.Ini
 {
-    [AttributeUsage(
-        AttributeTargets.Property | AttributeTargets.Field,
-
-        AllowMultiple = false,
-        Inherited = false)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
     public class IniConfigAttribute : Attribute
     {
-        internal string _name;
-        private string _pairName;
+        internal bool _lastSet;
+
         private string[] _description;
 
-        public IniConfigAttribute(string name = null, params string[] description)
+        public string Name { get; set; }
+
+        public string Description
         {
-            _name = name;
-            _description = description;
+            get
+            {
+                return (_description is null || !_description.Any()) ? "No description." : string.Join(Environment.NewLine, _description);
+            }
+            set
+            {
+                _description = value.SplitLines();
+            }
         }
 
-        public IniConfigAttribute(string name = null, string pairName = null)
-        {
-            _name = name;
-            _pairName = pairName;
-            _description = null;
-        }
+        public IniConfigAttribute() { }
 
-        public IniConfigAttribute(string name = null, string pairedName = null, params string[] description)
-        {
-            _name = name;
-            _pairName = pairedName;
-            _description = description.Select(x => x?.ToString() ?? "null string").ToArray();
-        }
+        public void ResetSet() 
+            => _lastSet = false;
 
-        public string GetName() => _name;
-        public string GetPairName() => string.IsNullOrWhiteSpace(_pairName) ? "global" : _pairName;
-
-        public string[] GetDescription() => _description ?? new string[] { };
+        public void Set() 
+            => _lastSet = true;
     }
 }

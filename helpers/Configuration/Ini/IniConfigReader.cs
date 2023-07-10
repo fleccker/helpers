@@ -3,7 +3,7 @@
 namespace helpers.Configuration.Ini
 {
     [LogSource("Ini Reader")]
-    public class IniConfigReader
+    public class IniConfigReader : DisposableBase
     {
         private string[] _buffer;
         private string _curKeyLine;
@@ -22,10 +22,10 @@ namespace helpers.Configuration.Ini
 
         public bool TryMove()
         {
+            CheckDisposed();
+
             if (_curPos >= _buffer.Length)
-            {
                 return false;
-            }
 
             _curKeyLine = _buffer[_curPos].Trim();
             _curPos++;
@@ -35,9 +35,7 @@ namespace helpers.Configuration.Ini
             IsLineValid = false;
 
             if (string.IsNullOrWhiteSpace(_curKeyLine) || _curKeyLine.StartsWith("#"))
-            {
                 return true;
-            }
 
             if (_curKeyLine != "[]" 
                 && _curKeyLine.StartsWith("[") 
@@ -46,7 +44,7 @@ namespace helpers.Configuration.Ini
                 LoadKey();
                 LoadValue();
 
-                IsLineValid = true;
+                IsLineValid = !string.IsNullOrWhiteSpace(CurrentKey);
             }
 
             return true;

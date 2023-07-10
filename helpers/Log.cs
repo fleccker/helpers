@@ -156,7 +156,7 @@ namespace helpers
 
             while (logBuilder.TryGetNext(out var line))
             {
-                str += $"{line} ";
+                str += $"{line.Item2} ";
             }
 
             return str.TrimEnd();

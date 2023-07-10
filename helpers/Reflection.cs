@@ -6,10 +6,9 @@ using System.Diagnostics;
 using System.Reflection;
 
 using helpers.Extensions;
+using helpers.Analyzors;
 
 using FastGenericNew;
-
-using helpers.Analyzors;
 
 namespace helpers
 {
@@ -23,6 +22,8 @@ namespace helpers
                                                                           TypeCode.DateTime, TypeCode.Char, TypeCode.String };
 
         public static IReadOnlyList<Type> PrimitiveTypes { get; } = PrimitiveTypeCodes.Select(x => Type(x)).ToList();
+
+        public const BindingFlags AllFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
 
         public static MethodBase GetExecutingMethod(int skipFrames = 0) => new StackTrace().GetFrames().Skip(skipFrames + 1).First().GetMethod();
 

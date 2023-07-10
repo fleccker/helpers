@@ -1,5 +1,5 @@
 ﻿using helpers.Configuration.Converters;
-
+using helpers.Extensions;
 using System;
 using System.Text;
 
@@ -21,16 +21,18 @@ namespace helpers.Configuration.Ini
             _builder = new StringBuilder();
         }
 
-        public IniConfigWriter WriteObject(string objectKey, string[] keyDescription, object obj)
+        public IniConfigWriter WriteObject(string objectKey, string keyDescription, object obj)
         {
             if (string.IsNullOrWhiteSpace(objectKey))
                 throw new ArgumentNullException(nameof(objectKey));
 
             if (_converter.TryConvert(obj, out var converted))
             {
-                if (keyDescription != null && keyDescription.Length > 0)
+                if (!string.IsNullOrWhiteSpace(keyDescription))
                 {
-                    foreach (var description in keyDescription)
+                    var lines = keyDescription.SplitLines();
+
+                    foreach (var description in lines)
                     {
                         if (!string.IsNullOrWhiteSpace(description))
                         {
